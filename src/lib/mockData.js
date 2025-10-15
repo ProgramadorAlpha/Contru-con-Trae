@@ -450,46 +450,6 @@ export const mockEquipmentMaintenance = [
     updatedAt: '2024-02-16T15:00:00Z'
   }
 ]
-    projectId: 'proj-1',
-    category: 'Facturas'
-  },
-  {
-    id: 'doc-5',
-    name: 'Planos Eléctricos - Edificio Aurora',
-    type: 'DWG',
-    size: '4.8 MB',
-    uploadDate: '2024-03-25',
-    projectId: 'proj-2',
-    category: 'Planos'
-  },
-  {
-    id: 'doc-6',
-    name: 'Informe de Avance - Marzo 2024',
-    type: 'DOCX',
-    size: '2.1 MB',
-    uploadDate: '2024-04-01',
-    projectId: 'proj-1',
-    category: 'Informes'
-  },
-  {
-    id: 'doc-7',
-    name: 'Fotos de Obra - Semana 12',
-    type: 'ZIP',
-    size: '15.6 MB',
-    uploadDate: '2024-03-28',
-    projectId: 'proj-2',
-    category: 'General'
-  },
-  {
-    id: 'doc-8',
-    name: 'Certificado de Calidad - Acero',
-    type: 'PDF',
-    size: '890 KB',
-    uploadDate: '2024-02-15',
-    projectId: 'proj-3',
-    category: 'General'
-  }
-]
 
 export const mockReports = [
   {

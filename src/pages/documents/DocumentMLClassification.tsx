@@ -323,3 +323,4 @@ const DocumentMLClassification: React.FC<DocumentMLClassificationProps> = ({
       </Card>
     </div>
   );
+};

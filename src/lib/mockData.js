@@ -134,33 +134,307 @@ export const mockBudgetItems = [
 export const mockTeamMembers = [
   {
     id: 'team-1',
-    name: 'Carlos Rodriguez',
-    role: 'Director de Proyecto',
+    firstName: 'Carlos',
+    lastName: 'Rodriguez',
+    fullName: 'Carlos Rodriguez',
+    name: 'Carlos Rodriguez', // backward compatibility
+    documentId: '12345678A',
+    birthDate: '1985-03-15',
+    avatar: 'CR',
     email: 'carlos@constructpro.com',
     phone: '+351 912 345 678',
-    avatar: 'CR',
+    address: 'Rua das Flores, 123, Lisboa',
+    emergencyContact: {
+      name: 'Maria Rodriguez',
+      phone: '+351 912 345 679',
+      relationship: 'Esposa'
+    },
+    employeeNumber: 'EMP001',
+    role: 'Director de Proyecto',
+    department: 'Gestión de Proyectos',
+    departmentId: 'dept-1',
+    hireDate: '2020-01-15',
+    salary: 65000,
     status: 'Activo',
-    projects: ['proj-1', 'proj-2']
+    skills: ['Gestión de Proyectos', 'Liderazgo', 'AutoCAD', 'MS Project'],
+    certifications: [
+      {
+        id: 'cert-1',
+        name: 'PMP - Project Management Professional',
+        issuer: 'PMI',
+        issueDate: '2021-06-15',
+        expiryDate: '2024-06-15',
+        certificateNumber: 'PMP123456',
+        status: 'Válido'
+      }
+    ],
+    availability: 85,
+    performance: 92,
+    projects: ['proj-1', 'proj-2'],
+    createdAt: '2020-01-15T10:00:00Z',
+    updatedAt: '2024-03-20T15:30:00Z'
   },
   {
     id: 'team-2',
-    name: 'Ana Silva',
-    role: 'Arquitecta',
+    firstName: 'Ana',
+    lastName: 'Silva',
+    fullName: 'Ana Silva',
+    name: 'Ana Silva', // backward compatibility
+    documentId: '87654321B',
+    birthDate: '1990-07-22',
+    avatar: 'AS',
     email: 'ana@constructpro.com',
     phone: '+351 923 456 789',
-    avatar: 'AS',
+    address: 'Avenida da Liberdade, 456, Lisboa',
+    emergencyContact: {
+      name: 'Pedro Silva',
+      phone: '+351 923 456 790',
+      relationship: 'Hermano'
+    },
+    employeeNumber: 'EMP002',
+    role: 'Arquitecta Senior',
+    department: 'Arquitectura',
+    departmentId: 'dept-2',
+    hireDate: '2019-09-01',
+    salary: 55000,
     status: 'Activo',
-    projects: ['proj-1', 'proj-3']
+    skills: ['AutoCAD', 'Revit', 'SketchUp', 'Diseño Sostenible'],
+    certifications: [
+      {
+        id: 'cert-2',
+        name: 'Arquitecto Colegiado',
+        issuer: 'Ordem dos Arquitectos',
+        issueDate: '2018-12-01',
+        certificateNumber: 'ARQ789',
+        status: 'Válido'
+      }
+    ],
+    availability: 90,
+    performance: 88,
+    projects: ['proj-1', 'proj-3'],
+    createdAt: '2019-09-01T10:00:00Z',
+    updatedAt: '2024-03-18T14:20:00Z'
   },
   {
     id: 'team-3',
-    name: 'João Santos',
-    role: 'Ingeniero Civil',
+    firstName: 'João',
+    lastName: 'Santos',
+    fullName: 'João Santos',
+    name: 'João Santos', // backward compatibility
+    documentId: '11223344C',
+    birthDate: '1987-11-10',
+    avatar: 'JS',
     email: 'joao@constructpro.com',
     phone: '+351 934 567 890',
-    avatar: 'JS',
+    address: 'Rua do Comércio, 789, Porto',
+    emergencyContact: {
+      name: 'Isabel Santos',
+      phone: '+351 934 567 891',
+      relationship: 'Madre'
+    },
+    employeeNumber: 'EMP003',
+    role: 'Ingeniero Civil',
+    department: 'Ingeniería',
+    departmentId: 'dept-3',
+    hireDate: '2021-03-10',
+    salary: 48000,
     status: 'Activo',
-    projects: ['proj-2', 'proj-4']
+    skills: ['Cálculo Estructural', 'SAP2000', 'AutoCAD', 'Gestión de Obra'],
+    certifications: [
+      {
+        id: 'cert-3',
+        name: 'Ingeniero Civil Colegiado',
+        issuer: 'Ordem dos Engenheiros',
+        issueDate: '2020-05-15',
+        certificateNumber: 'ENG456',
+        status: 'Válido'
+      }
+    ],
+    availability: 95,
+    performance: 85,
+    projects: ['proj-2', 'proj-4'],
+    createdAt: '2021-03-10T10:00:00Z',
+    updatedAt: '2024-03-19T11:45:00Z'
+  },
+  {
+    id: 'team-4',
+    firstName: 'Maria',
+    lastName: 'García',
+    fullName: 'Maria García',
+    name: 'Maria García',
+    documentId: '55667788D',
+    birthDate: '1992-05-18',
+    avatar: 'MG',
+    email: 'maria@constructpro.com',
+    phone: '+351 945 678 901',
+    address: 'Praça do Rossio, 321, Lisboa',
+    emergencyContact: {
+      name: 'Luis García',
+      phone: '+351 945 678 902',
+      relationship: 'Padre'
+    },
+    employeeNumber: 'EMP004',
+    role: 'Ingeniera Civil Junior',
+    department: 'Ingeniería',
+    departmentId: 'dept-3',
+    hireDate: '2023-01-15',
+    salary: 35000,
+    status: 'Activo',
+    skills: ['AutoCAD', 'Revit', 'Cálculo Básico', 'Topografía'],
+    certifications: [],
+    availability: 100,
+    performance: 78,
+    projects: ['proj-3'],
+    createdAt: '2023-01-15T10:00:00Z',
+    updatedAt: '2024-03-20T09:15:00Z'
+  },
+  {
+    id: 'team-5',
+    firstName: 'Roberto',
+    lastName: 'Hernández',
+    fullName: 'Roberto Hernández',
+    name: 'Roberto Hernández',
+    documentId: '99887766E',
+    birthDate: '1980-12-03',
+    avatar: 'RH',
+    email: 'roberto@constructpro.com',
+    phone: '+351 956 789 012',
+    address: 'Rua Augusta, 654, Lisboa',
+    emergencyContact: {
+      name: 'Carmen Hernández',
+      phone: '+351 956 789 013',
+      relationship: 'Esposa'
+    },
+    employeeNumber: 'EMP005',
+    role: 'Maestro de Obra',
+    department: 'Construcción',
+    departmentId: 'dept-4',
+    hireDate: '2018-06-20',
+    salary: 42000,
+    status: 'Activo',
+    skills: ['Supervisión de Obra', 'Seguridad Laboral', 'Lectura de Planos', 'Gestión de Equipos'],
+    certifications: [
+      {
+        id: 'cert-4',
+        name: 'Técnico en Prevención de Riesgos',
+        issuer: 'IEFP',
+        issueDate: '2019-03-10',
+        expiryDate: '2025-03-10',
+        certificateNumber: 'TPR789',
+        status: 'Válido'
+      }
+    ],
+    availability: 80,
+    performance: 93,
+    projects: ['proj-1', 'proj-2'],
+    createdAt: '2018-06-20T10:00:00Z',
+    updatedAt: '2024-03-21T16:00:00Z'
+  },
+  {
+    id: 'team-6',
+    firstName: 'Ana',
+    lastName: 'López',
+    fullName: 'Ana López',
+    name: 'Ana López',
+    documentId: '44556677F',
+    birthDate: '1988-09-25',
+    avatar: 'AL',
+    email: 'ana.lopez@constructpro.com',
+    phone: '+351 967 890 123',
+    address: 'Alameda dos Oceanos, 987, Lisboa',
+    emergencyContact: {
+      name: 'Miguel López',
+      phone: '+351 967 890 124',
+      relationship: 'Hermano'
+    },
+    employeeNumber: 'EMP006',
+    role: 'Coordinadora de Proyectos',
+    department: 'Gestión de Proyectos',
+    departmentId: 'dept-1',
+    hireDate: '2020-11-05',
+    salary: 52000,
+    status: 'Vacaciones',
+    skills: ['Coordinación', 'MS Project', 'Comunicación', 'Planificación'],
+    certifications: [],
+    availability: 0,
+    performance: 87,
+    projects: ['proj-4', 'proj-5'],
+    createdAt: '2020-11-05T10:00:00Z',
+    updatedAt: '2024-03-15T12:30:00Z'
+  },
+  {
+    id: 'team-7',
+    firstName: 'Diego',
+    lastName: 'Ramírez',
+    fullName: 'Diego Ramírez',
+    name: 'Diego Ramírez',
+    documentId: '33445566G',
+    birthDate: '1995-02-14',
+    avatar: 'DR',
+    email: 'diego@constructpro.com',
+    phone: '+351 978 901 234',
+    address: 'Rua da Prata, 147, Porto',
+    emergencyContact: {
+      name: 'Sofia Ramírez',
+      phone: '+351 978 901 235',
+      relationship: 'Madre'
+    },
+    employeeNumber: 'EMP007',
+    role: 'Operario Especializado',
+    department: 'Construcción',
+    departmentId: 'dept-4',
+    hireDate: '2022-08-01',
+    salary: 28000,
+    status: 'Activo',
+    skills: ['Soldadura', 'Carpintería', 'Albañilería', 'Electricidad Básica'],
+    certifications: [
+      {
+        id: 'cert-5',
+        name: 'Soldador Certificado',
+        issuer: 'IEFP',
+        issueDate: '2021-11-20',
+        expiryDate: '2026-11-20',
+        certificateNumber: 'SOLD123',
+        status: 'Válido'
+      }
+    ],
+    availability: 100,
+    performance: 82,
+    projects: ['proj-2', 'proj-3'],
+    createdAt: '2022-08-01T10:00:00Z',
+    updatedAt: '2024-03-22T08:45:00Z'
+  },
+  {
+    id: 'team-8',
+    firstName: 'Lucía',
+    lastName: 'Torres',
+    fullName: 'Lucía Torres',
+    name: 'Lucía Torres',
+    documentId: '22334455H',
+    birthDate: '1991-06-08',
+    avatar: 'LT',
+    email: 'lucia@constructpro.com',
+    phone: '+351 989 012 345',
+    address: 'Avenida 24 de Julho, 258, Lisboa',
+    emergencyContact: {
+      name: 'Carlos Torres',
+      phone: '+351 989 012 346',
+      relationship: 'Esposo'
+    },
+    employeeNumber: 'EMP008',
+    role: 'Diseñadora de Interiores',
+    department: 'Arquitectura',
+    departmentId: 'dept-2',
+    hireDate: '2021-10-12',
+    salary: 38000,
+    status: 'Activo',
+    skills: ['Diseño Interior', 'SketchUp', 'Photoshop', 'Selección de Materiales'],
+    certifications: [],
+    availability: 85,
+    performance: 90,
+    projects: ['proj-1', 'proj-4'],
+    createdAt: '2021-10-12T10:00:00Z',
+    updatedAt: '2024-03-20T13:20:00Z'
   }
 ]
 
@@ -352,7 +626,7 @@ export const mockEquipment = [
   }
 ]
 
-export const mockEquipmentCategories = [
+export const mockToolCategories = [
   {
     id: 'cat-1',
     name: 'Maquinaria Pesada',
@@ -383,7 +657,7 @@ export const mockEquipmentCategories = [
   }
 ]
 
-export const mockEquipmentTypes = [
+export const mockToolTypes = [
   { id: 'type-1', categoryId: 'cat-1', name: 'Excavadoras' },
   { id: 'type-2', categoryId: 'cat-1', name: 'Grúas' },
   { id: 'type-3', categoryId: 'cat-1', name: 'Compactadoras' },
@@ -391,10 +665,10 @@ export const mockEquipmentTypes = [
   { id: 'type-5', categoryId: 'cat-3', name: 'Iluminación' }
 ]
 
-export const mockEquipmentAssignments = [
+export const mockToolAssignments = [
   {
     id: 'assign-1',
-    equipmentId: 'equip-2',
+    toolId: 'equip-2',
     projectId: 'proj-1',
     assignedTo: 'team-1',
     assignedBy: 'team-1',
@@ -407,7 +681,7 @@ export const mockEquipmentAssignments = [
   },
   {
     id: 'assign-2',
-    equipmentId: 'equip-5',
+    toolId: 'equip-5',
     projectId: 'proj-2',
     assignedTo: 'team-2',
     assignedBy: 'team-1',
@@ -420,10 +694,10 @@ export const mockEquipmentAssignments = [
   }
 ]
 
-export const mockEquipmentMaintenance = [
+export const mockToolMaintenance = [
   {
     id: 'maint-1',
-    equipmentId: 'equip-3',
+    toolId: 'equip-3',
     type: 'preventive',
     description: 'Mantenimiento preventivo programado',
     scheduledDate: '2024-03-20',
@@ -437,7 +711,7 @@ export const mockEquipmentMaintenance = [
   },
   {
     id: 'maint-2',
-    equipmentId: 'equip-1',
+    toolId: 'equip-1',
     type: 'corrective',
     description: 'Reparación de cucharón',
     scheduledDate: '2024-02-15',
@@ -492,14 +766,305 @@ export const mockVisits = [
   // { id, projectId, date, time, visitor, purpose, notes }
 ]
 
-// Estadísticas de equipos para el dashboard
-export const mockEquipmentStats = {
-  totalEquipment: 5,
-  availableEquipment: 2,
-  inUseEquipment: 2,
-  inMaintenanceEquipment: 1,
-  retiredEquipment: 0,
+// Datos de departamentos
+export const mockDepartments = [
+  {
+    id: 'dept-1',
+    name: 'Gestión de Proyectos',
+    description: 'Departamento encargado de la planificación y coordinación de proyectos',
+    managerId: 'team-1',
+    managerName: 'Carlos Rodriguez',
+    employeeCount: 2,
+    budget: 150000,
+    status: 'Activo',
+    createdAt: '2020-01-01T10:00:00Z',
+    updatedAt: '2024-03-20T15:30:00Z'
+  },
+  {
+    id: 'dept-2',
+    name: 'Arquitectura',
+    description: 'Departamento de diseño arquitectónico y planificación espacial',
+    managerId: 'team-2',
+    managerName: 'Ana Silva',
+    employeeCount: 2,
+    budget: 120000,
+    status: 'Activo',
+    createdAt: '2019-06-01T10:00:00Z',
+    updatedAt: '2024-03-18T14:20:00Z'
+  },
+  {
+    id: 'dept-3',
+    name: 'Ingeniería',
+    description: 'Departamento de ingeniería civil y cálculos estructurales',
+    managerId: 'team-3',
+    managerName: 'João Santos',
+    employeeCount: 2,
+    budget: 100000,
+    status: 'Activo',
+    createdAt: '2020-03-01T10:00:00Z',
+    updatedAt: '2024-03-19T11:45:00Z'
+  },
+  {
+    id: 'dept-4',
+    name: 'Construcción',
+    description: 'Departamento de ejecución y supervisión de obras',
+    managerId: 'team-5',
+    managerName: 'Roberto Hernández',
+    employeeCount: 2,
+    budget: 80000,
+    status: 'Activo',
+    createdAt: '2018-01-01T10:00:00Z',
+    updatedAt: '2024-03-21T16:00:00Z'
+  }
+]
+
+// Datos de asignaciones de empleados a proyectos
+export const mockAssignments = [
+  {
+    id: 'assign-1',
+    employeeId: 'team-1',
+    employeeName: 'Carlos Rodriguez',
+    projectId: 'proj-1',
+    projectName: 'Proyecto Girassol',
+    role: 'Director de Proyecto',
+    startDate: '2024-01-15',
+    endDate: '2025-06-30',
+    dedication: 60,
+    status: 'Activa',
+    notes: 'Responsable principal del proyecto',
+    createdAt: '2024-01-15T10:00:00Z',
+    updatedAt: '2024-01-15T10:00:00Z'
+  },
+  {
+    id: 'assign-2',
+    employeeId: 'team-1',
+    employeeName: 'Carlos Rodriguez',
+    projectId: 'proj-2',
+    projectName: 'Edificio Aurora',
+    role: 'Supervisor',
+    startDate: '2024-03-01',
+    endDate: '2025-09-15',
+    dedication: 25,
+    status: 'Activa',
+    notes: 'Supervisión y apoyo técnico',
+    createdAt: '2024-03-01T10:00:00Z',
+    updatedAt: '2024-03-01T10:00:00Z'
+  },
+  {
+    id: 'assign-3',
+    employeeId: 'team-2',
+    employeeName: 'Ana Silva',
+    projectId: 'proj-1',
+    projectName: 'Proyecto Girassol',
+    role: 'Arquitecta Principal',
+    startDate: '2024-01-15',
+    endDate: '2025-06-30',
+    dedication: 50,
+    status: 'Activa',
+    notes: 'Diseño arquitectónico y supervisión',
+    createdAt: '2024-01-15T10:00:00Z',
+    updatedAt: '2024-01-15T10:00:00Z'
+  },
+  {
+    id: 'assign-4',
+    employeeId: 'team-2',
+    employeeName: 'Ana Silva',
+    projectId: 'proj-3',
+    projectName: 'Complejo Verde',
+    role: 'Consultora de Diseño',
+    startDate: '2024-02-10',
+    endDate: '2025-08-20',
+    dedication: 40,
+    status: 'Activa',
+    notes: 'Consultoría en diseño sostenible',
+    createdAt: '2024-02-10T10:00:00Z',
+    updatedAt: '2024-02-10T10:00:00Z'
+  },
+  {
+    id: 'assign-5',
+    employeeId: 'team-3',
+    employeeName: 'João Santos',
+    projectId: 'proj-2',
+    projectName: 'Edificio Aurora',
+    role: 'Ingeniero Estructural',
+    startDate: '2024-03-01',
+    endDate: '2025-09-15',
+    dedication: 70,
+    status: 'Activa',
+    notes: 'Cálculos estructurales y supervisión técnica',
+    createdAt: '2024-03-01T10:00:00Z',
+    updatedAt: '2024-03-01T10:00:00Z'
+  },
+  {
+    id: 'assign-6',
+    employeeId: 'team-4',
+    employeeName: 'Maria García',
+    projectId: 'proj-3',
+    projectName: 'Complejo Verde',
+    role: 'Ingeniera de Apoyo',
+    startDate: '2024-02-10',
+    endDate: '2025-08-20',
+    dedication: 100,
+    status: 'Activa',
+    notes: 'Apoyo en cálculos y seguimiento de obra',
+    createdAt: '2024-02-10T10:00:00Z',
+    updatedAt: '2024-02-10T10:00:00Z'
+  }
+]
+
+// Datos de asistencia
+export const mockAttendance = [
+  // Marzo 2024 - Semana del 18-22
+  {
+    id: 'att-1',
+    employeeId: 'team-1',
+    employeeName: 'Carlos Rodriguez',
+    date: '2024-03-18',
+    status: 'Presente',
+    checkIn: '08:30',
+    checkOut: '17:30',
+    hoursWorked: 8,
+    notes: ''
+  },
+  {
+    id: 'att-2',
+    employeeId: 'team-1',
+    employeeName: 'Carlos Rodriguez',
+    date: '2024-03-19',
+    status: 'Presente',
+    checkIn: '08:45',
+    checkOut: '17:45',
+    hoursWorked: 8,
+    notes: ''
+  },
+  {
+    id: 'att-3',
+    employeeId: 'team-1',
+    employeeName: 'Carlos Rodriguez',
+    date: '2024-03-20',
+    status: 'Presente',
+    checkIn: '08:30',
+    checkOut: '17:30',
+    hoursWorked: 8,
+    notes: ''
+  },
+  {
+    id: 'att-4',
+    employeeId: 'team-1',
+    employeeName: 'Carlos Rodriguez',
+    date: '2024-03-21',
+    status: 'Presente',
+    checkIn: '08:30',
+    checkOut: '17:30',
+    hoursWorked: 8,
+    notes: ''
+  },
+  {
+    id: 'att-5',
+    employeeId: 'team-1',
+    employeeName: 'Carlos Rodriguez',
+    date: '2024-03-22',
+    status: 'Presente',
+    checkIn: '08:30',
+    checkOut: '17:30',
+    hoursWorked: 8,
+    notes: ''
+  },
+  {
+    id: 'att-6',
+    employeeId: 'team-2',
+    employeeName: 'Ana Silva',
+    date: '2024-03-18',
+    status: 'Presente',
+    checkIn: '09:00',
+    checkOut: '18:00',
+    hoursWorked: 8,
+    notes: ''
+  },
+  {
+    id: 'att-7',
+    employeeId: 'team-2',
+    employeeName: 'Ana Silva',
+    date: '2024-03-19',
+    status: 'Presente',
+    checkIn: '09:00',
+    checkOut: '18:00',
+    hoursWorked: 8,
+    notes: ''
+  },
+  {
+    id: 'att-8',
+    employeeId: 'team-2',
+    employeeName: 'Ana Silva',
+    date: '2024-03-20',
+    status: 'Tardanza',
+    checkIn: '09:30',
+    checkOut: '18:30',
+    hoursWorked: 8,
+    notes: 'Retraso por tráfico'
+  },
+  {
+    id: 'att-9',
+    employeeId: 'team-3',
+    employeeName: 'João Santos',
+    date: '2024-03-18',
+    status: 'Presente',
+    checkIn: '08:00',
+    checkOut: '17:00',
+    hoursWorked: 8,
+    notes: ''
+  },
+  {
+    id: 'att-10',
+    employeeId: 'team-3',
+    employeeName: 'João Santos',
+    date: '2024-03-19',
+    status: 'Ausente',
+    checkIn: '',
+    checkOut: '',
+    hoursWorked: 0,
+    notes: 'Cita médica',
+    justification: 'Consulta médica programada'
+  },
+  {
+    id: 'att-11',
+    employeeId: 'team-6',
+    employeeName: 'Ana López',
+    date: '2024-03-18',
+    status: 'Vacaciones',
+    checkIn: '',
+    checkOut: '',
+    hoursWorked: 0,
+    notes: 'Vacaciones anuales'
+  },
+  {
+    id: 'att-12',
+    employeeId: 'team-6',
+    employeeName: 'Ana López',
+    date: '2024-03-19',
+    status: 'Vacaciones',
+    checkIn: '',
+    checkOut: '',
+    hoursWorked: 0,
+    notes: 'Vacaciones anuales'
+  }
+]
+
+// Estadísticas de herramientas para el dashboard
+export const mockToolStats = {
+  totalTools: 5,
+  availableTools: 2,
+  inUseTools: 2,
+  inMaintenanceTools: 1,
+  retiredTools: 0,
   totalValue: 1000000,
   upcomingMaintenance: 2,
   overdueMaintenance: 0
 }
+
+// Aliases de compatibilidad para nomenclatura antigua de equipos
+export { mockToolCategories as mockEquipmentCategories };
+export { mockToolTypes as mockEquipmentTypes };
+export { mockToolAssignments as mockEquipmentAssignments };
+export { mockToolMaintenance as mockEquipmentMaintenance };
+export { mockToolStats as mockEquipmentStats };

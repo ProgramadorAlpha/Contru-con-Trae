@@ -144,8 +144,8 @@ export function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Equipos Disponibles</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboardData.availableEquipment || 0}</p>
-              <p className="text-sm text-blue-600 mt-1">{dashboardData.inMaintenanceEquipment || 0} en mantenimiento</p>
+              <p className="text-2xl font-bold text-gray-900">{dashboardData.availableTools || 0}</p>
+              <p className="text-sm text-blue-600 mt-1">{dashboardData.inMaintenanceTools || 0} en mantenimiento</p>
             </div>
             <div className="bg-orange-100 rounded-lg p-3">
               <Wrench className="w-6 h-6 text-orange-600" />
@@ -244,7 +244,7 @@ export function Dashboard() {
             <Calendar className="w-6 h-6 mb-2" />
             <span className="text-sm font-medium">Agendar Visita</span>
           </button>
-          <Link to="/equipment" className="flex flex-col items-center p-6 rounded-lg bg-orange-600 text-white hover:bg-orange-700 transition-colors">
+          <Link to="/tools" className="flex flex-col items-center p-6 rounded-lg bg-orange-600 text-white hover:bg-orange-700 transition-colors">
             <Wrench className="w-6 h-6 mb-2" />
             <span className="text-sm font-medium">Gestión de Equipos</span>
           </Link>

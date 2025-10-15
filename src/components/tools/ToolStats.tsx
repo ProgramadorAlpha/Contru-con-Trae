@@ -1,7 +1,7 @@
 import React from 'react';
 import { Settings, DollarSign, Clock, AlertCircle, TrendingUp, Package } from 'lucide-react';
 
-interface EquipmentStatsProps {
+interface ToolStatsProps {
   stats: {
     total: number;
     available: number;
@@ -15,7 +15,7 @@ interface EquipmentStatsProps {
   };
 }
 
-const EquipmentStats: React.FC<EquipmentStatsProps> = ({ stats }) => {
+const ToolStats: React.FC<ToolStatsProps> = ({ stats }) => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
@@ -27,7 +27,7 @@ const EquipmentStats: React.FC<EquipmentStatsProps> = ({ stats }) => {
 
   const statCards = [
     {
-      title: 'Total Equipos',
+      title: 'Total Herramientas',
       value: stats.total,
       icon: Package,
       color: 'blue',
@@ -127,4 +127,4 @@ const EquipmentStats: React.FC<EquipmentStatsProps> = ({ stats }) => {
   );
 };
 
-export default EquipmentStats;
+export default ToolStats;

@@ -18,7 +18,7 @@ const menuItems = [
   { name: 'Presupuesto', href: '/budget', icon: Calculator },
   { name: 'Reportes', href: '/reports', icon: BarChart3 },
   { name: 'Documentos', href: '/documents', icon: FileText },
-  { name: 'Equipos', href: '/equipment', icon: Wrench },
+  { name: 'Herramientas', href: '/tools', icon: Wrench },
   { name: 'Equipo de Trabajo', href: '/team', icon: Users },
 ]
 

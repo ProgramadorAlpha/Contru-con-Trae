@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { X, Calendar, DollarSign, User, FileText, Plus, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { Equipment } from '../../types/equipment';
-import { equipmentAPI } from '../../lib/api';
+import { Tool } from '../../types/tools';
+import { toolAPI } from '../../lib/api';
 
-interface EquipmentMaintenanceProps {
-  equipment: Equipment;
+interface ToolMaintenanceProps {
+  tool: Tool;
   onClose: () => void;
 }
 
-const EquipmentMaintenance: React.FC<EquipmentMaintenanceProps> = ({ equipment, onClose }) => {
+const ToolMaintenance: React.FC<ToolMaintenanceProps> = ({ tool, onClose }) => {
   const [maintenanceHistory, setMaintenanceHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -24,12 +24,12 @@ const EquipmentMaintenance: React.FC<EquipmentMaintenanceProps> = ({ equipment, 
 
   useEffect(() => {
     loadMaintenanceHistory();
-  }, [equipment.id]);
+  }, [tool.id]);
 
   const loadMaintenanceHistory = async () => {
     try {
       setLoading(true);
-      const history = await equipmentAPI.getMaintenanceHistory(equipment.id);
+      const history = await toolAPI.getMaintenanceHistory(tool.id);
       setMaintenanceHistory(history);
     } catch (error) {
       console.error('Error loading maintenance history:', error);
@@ -51,7 +51,7 @@ const EquipmentMaintenance: React.FC<EquipmentMaintenanceProps> = ({ equipment, 
         cost: formData.cost ? Number(formData.cost) : 0,
       };
 
-      await equipmentAPI.scheduleMaintenance(equipment.id, maintenanceData);
+      await toolAPI.scheduleMaintenance(tool.id, maintenanceData);
       setShowForm(false);
       setFormData({
         type: 'preventive',
@@ -121,7 +121,7 @@ const EquipmentMaintenance: React.FC<EquipmentMaintenanceProps> = ({ equipment, 
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
-            Mantenimiento de Equipo
+            Mantenimiento de Herramienta
           </h2>
           <button
             onClick={onClose}
@@ -139,14 +139,14 @@ const EquipmentMaintenance: React.FC<EquipmentMaintenanceProps> = ({ equipment, 
                 <FileText className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">{equipment.name}</h3>
+                <h3 className="font-semibold text-gray-900">{tool.name}</h3>
                 <p className="text-sm text-gray-600">
-                  {equipment.brand} {equipment.model} • {equipment.category}
+                  {tool.brand} {tool.model} • {tool.category}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Estado: {equipment.status === 'available' ? 'Disponible' : 
-                           equipment.status === 'in_use' ? 'En uso' : 
-                           equipment.status === 'maintenance' ? 'En mantenimiento' : 'Retirado'}
+                  Estado: {tool.status === 'available' ? 'Disponible' : 
+                           tool.status === 'in_use' ? 'En uso' : 
+                           tool.status === 'maintenance' ? 'En mantenimiento' : 'Retirado'}
                 </p>
               </div>
             </div>
@@ -432,4 +432,4 @@ const EquipmentMaintenance: React.FC<EquipmentMaintenanceProps> = ({ equipment, 
   );
 };
 
-export default EquipmentMaintenance;
+export default ToolMaintenance;

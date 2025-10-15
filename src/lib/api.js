@@ -16,7 +16,10 @@ import {
   mockEquipmentTypes,
   mockEquipmentAssignments,
   mockEquipmentMaintenance,
-  mockEquipmentStats
+  mockEquipmentStats,
+  mockDepartments,
+  mockAssignments,
+  mockAttendance
 } from './mockData'
 
 // Simular delay de red
@@ -99,25 +102,397 @@ export const budgetAPI = {
 
 // API de Equipo
 export const teamAPI = {
-  async getAll() {
+  // Empleados
+  async getEmployees(filters = {}) {
     await delay(500)
-    return mockTeamMembers
+    let employees = [...mockTeamMembers]
+
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase()
+      employees = employees.filter(emp => 
+        emp.fullName.toLowerCase().includes(searchTerm) ||
+        emp.email.toLowerCase().includes(searchTerm) ||
+        emp.role.toLowerCase().includes(searchTerm) ||
+        emp.department.toLowerCase().includes(searchTerm)
+      )
+    }
+
+    if (filters.department) {
+      employees = employees.filter(emp => emp.departmentId === filters.department)
+    }
+
+    if (filters.role) {
+      employees = employees.filter(emp => emp.role.toLowerCase().includes(filters.role.toLowerCase()))
+    }
+
+    if (filters.status) {
+      employees = employees.filter(emp => emp.status === filters.status)
+    }
+
+    if (filters.minPerformance) {
+      employees = employees.filter(emp => emp.performance >= filters.minPerformance)
+    }
+
+    if (filters.maxPerformance) {
+      employees = employees.filter(emp => emp.performance <= filters.maxPerformance)
+    }
+
+    return employees
+  },
+
+  async getEmployeeById(id) {
+    await delay(300)
+    const employee = mockTeamMembers.find(member => member.id === id)
+    if (!employee) throw new Error('Empleado no encontrado')
+    
+    // Enriquecer con asignaciones y asistencia
+    const assignments = mockAssignments.filter(a => a.employeeId === id)
+    const attendance = mockAttendance.filter(a => a.employeeId === id)
+    
+    return {
+      ...employee,
+      assignments,
+      attendance
+    }
+  },
+
+  async createEmployee(employeeData) {
+    await delay(400)
+    const newEmployee = {
+      ...employeeData,
+      id: `team-${Date.now()}`,
+      fullName: `${employeeData.firstName} ${employeeData.lastName}`,
+      name: `${employeeData.firstName} ${employeeData.lastName}`, // backward compatibility
+      avatar: `${employeeData.firstName.charAt(0)}${employeeData.lastName.charAt(0)}`.toUpperCase(),
+      status: 'Activo',
+      availability: 100,
+      performance: 75,
+      projects: [],
+      skills: employeeData.skills || [],
+      certifications: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+    mockTeamMembers.push(newEmployee)
+    
+    // Actualizar contador del departamento
+    const department = mockDepartments.find(d => d.id === employeeData.departmentId)
+    if (department) {
+      department.employeeCount += 1
+    }
+    
+    return newEmployee
+  },
+
+  async updateEmployee(id, updates) {
+    await delay(400)
+    const index = mockTeamMembers.findIndex(emp => emp.id === id)
+    if (index === -1) throw new Error('Empleado no encontrado')
+
+    const oldEmployee = mockTeamMembers[index]
+    mockTeamMembers[index] = {
+      ...oldEmployee,
+      ...updates,
+      fullName: updates.firstName && updates.lastName ? 
+        `${updates.firstName} ${updates.lastName}` : oldEmployee.fullName,
+      name: updates.firstName && updates.lastName ? 
+        `${updates.firstName} ${updates.lastName}` : oldEmployee.name,
+      updatedAt: new Date().toISOString()
+    }
+
+    // Actualizar contadores de departamentos si cambió
+    if (updates.departmentId && updates.departmentId !== oldEmployee.departmentId) {
+      const oldDept = mockDepartments.find(d => d.id === oldEmployee.departmentId)
+      const newDept = mockDepartments.find(d => d.id === updates.departmentId)
+      if (oldDept) oldDept.employeeCount -= 1
+      if (newDept) newDept.employeeCount += 1
+    }
+
+    return mockTeamMembers[index]
+  },
+
+  async deleteEmployee(id) {
+    await delay(400)
+    const index = mockTeamMembers.findIndex(emp => emp.id === id)
+    if (index === -1) return false
+
+    const employee = mockTeamMembers[index]
+    
+    // Verificar que no tenga asignaciones activas
+    const activeAssignments = mockAssignments.filter(a => 
+      a.employeeId === id && a.status === 'Activa'
+    )
+    
+    if (activeAssignments.length > 0) {
+      throw new Error('No se puede eliminar un empleado con asignaciones activas')
+    }
+
+    mockTeamMembers.splice(index, 1)
+    
+    // Actualizar contador del departamento
+    const department = mockDepartments.find(d => d.id === employee.departmentId)
+    if (department) {
+      department.employeeCount -= 1
+    }
+
+    return true
+  },
+
+  // Departamentos
+  async getDepartments() {
+    await delay(400)
+    return mockDepartments
+  },
+
+  async getDepartmentById(id) {
+    await delay(300)
+    const department = mockDepartments.find(d => d.id === id)
+    if (!department) throw new Error('Departamento no encontrado')
+    
+    // Enriquecer con empleados
+    const employees = mockTeamMembers.filter(emp => emp.departmentId === id)
+    
+    return {
+      ...department,
+      employees
+    }
+  },
+
+  async createDepartment(departmentData) {
+    await delay(400)
+    const newDepartment = {
+      ...departmentData,
+      id: `dept-${Date.now()}`,
+      employeeCount: 0,
+      status: 'Activo',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+    
+    // Obtener nombre del manager
+    const manager = mockTeamMembers.find(emp => emp.id === departmentData.managerId)
+    if (manager) {
+      newDepartment.managerName = manager.fullName
+    }
+    
+    mockDepartments.push(newDepartment)
+    return newDepartment
+  },
+
+  async updateDepartment(id, updates) {
+    await delay(400)
+    const index = mockDepartments.findIndex(d => d.id === id)
+    if (index === -1) throw new Error('Departamento no encontrado')
+
+    // Obtener nombre del manager si cambió
+    if (updates.managerId) {
+      const manager = mockTeamMembers.find(emp => emp.id === updates.managerId)
+      if (manager) {
+        updates.managerName = manager.fullName
+      }
+    }
+
+    mockDepartments[index] = {
+      ...mockDepartments[index],
+      ...updates,
+      updatedAt: new Date().toISOString()
+    }
+
+    return mockDepartments[index]
+  },
+
+  async deleteDepartment(id) {
+    await delay(400)
+    const index = mockDepartments.findIndex(d => d.id === id)
+    if (index === -1) return false
+
+    const department = mockDepartments[index]
+    
+    // Verificar que no tenga empleados
+    if (department.employeeCount > 0) {
+      throw new Error('No se puede eliminar un departamento con empleados asignados')
+    }
+
+    mockDepartments.splice(index, 1)
+    return true
+  },
+
+  // Asignaciones
+  async getAssignments(filters = {}) {
+    await delay(400)
+    let assignments = [...mockAssignments]
+
+    if (filters.employeeId) {
+      assignments = assignments.filter(a => a.employeeId === filters.employeeId)
+    }
+
+    if (filters.projectId) {
+      assignments = assignments.filter(a => a.projectId === filters.projectId)
+    }
+
+    if (filters.status) {
+      assignments = assignments.filter(a => a.status === filters.status)
+    }
+
+    return assignments
+  },
+
+  async createAssignment(assignmentData) {
+    await delay(400)
+    
+    // Verificar disponibilidad del empleado
+    const employee = mockTeamMembers.find(emp => emp.id === assignmentData.employeeId)
+    if (!employee) throw new Error('Empleado no encontrado')
+    
+    const activeAssignments = mockAssignments.filter(a => 
+      a.employeeId === assignmentData.employeeId && a.status === 'Activa'
+    )
+    
+    const totalDedication = activeAssignments.reduce((sum, a) => sum + a.dedication, 0)
+    
+    if (totalDedication + assignmentData.dedication > 100) {
+      throw new Error('El empleado no tiene suficiente disponibilidad')
+    }
+
+    const project = mockProjects.find(p => p.id === assignmentData.projectId)
+    
+    const newAssignment = {
+      ...assignmentData,
+      id: `assign-${Date.now()}`,
+      employeeName: employee.fullName,
+      projectName: project ? project.name : 'Proyecto desconocido',
+      status: 'Activa',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+    
+    mockAssignments.push(newAssignment)
+    
+    // Actualizar disponibilidad del empleado
+    employee.availability = 100 - (totalDedication + assignmentData.dedication)
+    
+    // Agregar proyecto a la lista del empleado
+    if (!employee.projects.includes(assignmentData.projectId)) {
+      employee.projects.push(assignmentData.projectId)
+    }
+    
+    return newAssignment
+  },
+
+  async updateAssignment(id, updates) {
+    await delay(400)
+    const index = mockAssignments.findIndex(a => a.id === id)
+    if (index === -1) throw new Error('Asignación no encontrada')
+
+    mockAssignments[index] = {
+      ...mockAssignments[index],
+      ...updates,
+      updatedAt: new Date().toISOString()
+    }
+
+    return mockAssignments[index]
+  },
+
+  async deleteAssignment(id) {
+    await delay(400)
+    const index = mockAssignments.findIndex(a => a.id === id)
+    if (index === -1) return false
+
+    const assignment = mockAssignments[index]
+    mockAssignments.splice(index, 1)
+    
+    // Recalcular disponibilidad del empleado
+    const employee = mockTeamMembers.find(emp => emp.id === assignment.employeeId)
+    if (employee) {
+      const activeAssignments = mockAssignments.filter(a => 
+        a.employeeId === assignment.employeeId && a.status === 'Activa'
+      )
+      const totalDedication = activeAssignments.reduce((sum, a) => sum + a.dedication, 0)
+      employee.availability = 100 - totalDedication
+    }
+
+    return true
+  },
+
+  // Asistencia
+  async getAttendance(filters = {}) {
+    await delay(400)
+    let attendance = [...mockAttendance]
+
+    if (filters.employeeId) {
+      attendance = attendance.filter(a => a.employeeId === filters.employeeId)
+    }
+
+    if (filters.dateFrom) {
+      attendance = attendance.filter(a => a.date >= filters.dateFrom)
+    }
+
+    if (filters.dateTo) {
+      attendance = attendance.filter(a => a.date <= filters.dateTo)
+    }
+
+    if (filters.status) {
+      attendance = attendance.filter(a => a.status === filters.status)
+    }
+
+    return attendance
+  },
+
+  async createAttendanceRecord(attendanceData) {
+    await delay(400)
+    const employee = mockTeamMembers.find(emp => emp.id === attendanceData.employeeId)
+    
+    const newRecord = {
+      ...attendanceData,
+      id: `att-${Date.now()}`,
+      employeeName: employee ? employee.fullName : 'Empleado desconocido'
+    }
+    
+    mockAttendance.push(newRecord)
+    return newRecord
+  },
+
+  // Estadísticas
+  async getTeamStats() {
+    await delay(400)
+    const totalEmployees = mockTeamMembers.length
+    const activeEmployees = mockTeamMembers.filter(emp => emp.status === 'Activo').length
+    const totalDepartments = mockDepartments.length
+    
+    const averagePerformance = totalEmployees > 0 ? 
+      Math.round(mockTeamMembers.reduce((sum, emp) => sum + emp.performance, 0) / totalEmployees) : 0
+    
+    const activeAssignments = mockAssignments.filter(a => a.status === 'Activa').length
+    
+    // Calcular tasa de asistencia (últimos 30 días)
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    const recentAttendance = mockAttendance.filter(a => new Date(a.date) >= thirtyDaysAgo)
+    const presentDays = recentAttendance.filter(a => a.status === 'Presente').length
+    const attendanceRate = recentAttendance.length > 0 ? 
+      Math.round((presentDays / recentAttendance.length) * 100) : 0
+    
+    return {
+      totalEmployees,
+      activeEmployees,
+      averagePerformance,
+      totalDepartments,
+      attendanceRate,
+      activeAssignments
+    }
+  },
+
+  // Backward compatibility
+  async getAll() {
+    return this.getEmployees()
   },
 
   async getById(id) {
-    await delay(300)
-    return mockTeamMembers.find(member => member.id === id)
+    return this.getEmployeeById(id)
   },
 
   async create(member) {
-    await delay(400)
-    const newMember = {
-      ...member,
-      id: `team-${Date.now()}`,
-      status: 'Activo'
-    }
-    mockTeamMembers.push(newMember)
-    return newMember
+    return this.createEmployee(member)
   }
 }
 
@@ -323,12 +698,18 @@ export const dashboardAPI = {
       averageProgress: mockProjects.length > 0 ? (mockProjects.reduce((sum, p) => sum + p.progress, 0) / mockProjects.length) : 0,
       recentProjects,
       upcomingDeadlines,
-      // Estadísticas de equipos
+      // Estadísticas de herramientas/equipos
       availableEquipment: mockEquipmentStats.availableEquipment,
       inMaintenanceEquipment: mockEquipmentStats.inMaintenanceEquipment,
       totalEquipment: mockEquipmentStats.totalEquipment,
-      equipmentUtilization: mockEquipmentStats.totalEquipment > 0 ? 
-        ((mockEquipmentStats.totalEquipment - mockEquipmentStats.availableEquipment) / mockEquipmentStats.totalEquipment) * 100 : 0
+      equipmentUtilization: mockEquipmentStats.totalEquipment > 0 ?
+        ((mockEquipmentStats.totalEquipment - mockEquipmentStats.availableEquipment) / mockEquipmentStats.totalEquipment) * 100 : 0,
+      // Nuevas claves para herramientas (compatibilidad con Dashboard)
+      availableTools: mockEquipmentStats.availableTools ?? mockEquipmentStats.availableEquipment,
+      inMaintenanceTools: mockEquipmentStats.inMaintenanceTools ?? mockEquipmentStats.inMaintenanceEquipment,
+      totalTools: mockEquipmentStats.totalTools ?? mockEquipmentStats.totalEquipment,
+      toolsUtilization: (mockEquipmentStats.totalTools ?? mockEquipmentStats.totalEquipment) > 0 ?
+        (((mockEquipmentStats.totalTools ?? mockEquipmentStats.totalEquipment) - (mockEquipmentStats.availableTools ?? mockEquipmentStats.availableEquipment)) / (mockEquipmentStats.totalTools ?? mockEquipmentStats.totalEquipment)) * 100 : 0
     }
   },
 
@@ -673,4 +1054,5 @@ export const equipmentAPI = {
 }
 
 // Exportar configuración
+export const toolAPI = equipmentAPI
 export { USE_FIREBASE }

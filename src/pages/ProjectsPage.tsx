@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Plus, Search, Edit, Trash2, Eye, Calendar, DollarSign, MapPin, Building2 } from 'lucide-react'
 import { projectAPI } from '@/lib/api'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate } from '@/lib/chartUtils'
 
 export function ProjectsPage() {
   const [projects, setProjects] = useState([])

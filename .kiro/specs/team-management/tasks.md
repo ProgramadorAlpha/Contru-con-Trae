@@ -135,6 +135,8 @@
 - [ ] 18. Realizar pruebas finales y refinamientos
 
 
+
+
   - Probar todos los flujos de usuario en diferentes dispositivos
   - Verificar responsive design y accesibilidad
   - Optimizar performance y corregir bugs encontrados

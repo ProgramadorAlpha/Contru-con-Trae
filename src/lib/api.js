@@ -662,7 +662,7 @@ export const reportAPI = {
 
 // Dashboard Stats
 export const dashboardAPI = {
-  async getStats() {
+  async getStats(timeFilter = 'month') {
     await delay(500)
     const totalBudget = mockProjects.reduce((sum, p) => sum + p.budget, 0)
     const totalSpent = mockProjects.reduce((sum, p) => sum + p.spent, 0)
@@ -685,6 +685,58 @@ export const dashboardAPI = {
         return { id: `${p.id}-deadline`, title: 'Entrega', project: p.name, date: p.endDate, daysLeft }
       })
 
+    // Generate chart data based on time filter
+    const generateBudgetTrend = () => {
+      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+      const currentMonth = new Date().getMonth()
+      
+      let periods = []
+      switch (timeFilter) {
+        case 'week':
+          periods = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+          break
+        case 'quarter':
+          periods = months.slice(Math.floor(currentMonth / 3) * 3, Math.floor(currentMonth / 3) * 3 + 3)
+          break
+        case 'year':
+          periods = months
+          break
+        default: // month
+          periods = months.slice(Math.max(0, currentMonth - 5), currentMonth + 1)
+      }
+      
+      return periods.map((period, index) => ({
+        month: period,
+        budget: Math.round(totalBudget * (0.7 + Math.random() * 0.3) * ((index + 1) / periods.length)),
+        spent: Math.round(totalSpent * (0.6 + Math.random() * 0.4) * ((index + 1) / periods.length))
+      }))
+    }
+
+    const projectProgress = mockProjects.map(p => ({
+      name: p.name.length > 15 ? p.name.substring(0, 15) + '...' : p.name,
+      progress: p.progress
+    }))
+
+    // Budget by category
+    const categoryMap = {}
+    for (const item of mockBudgetItems) {
+      categoryMap[item.category] = categoryMap[item.category] || { budget: 0, spent: 0 }
+      categoryMap[item.category].budget += item.total || 0
+      categoryMap[item.category].spent += item.actual || 0
+    }
+    const budgetByCategory = Object.entries(categoryMap).map(([category, vals]) => ({
+      category,
+      budget: vals.budget,
+      spent: vals.spent
+    }))
+
+    // Team distribution
+    const roleMap = {}
+    for (const member of mockTeamMembers) {
+      roleMap[member.role] = (roleMap[member.role] || 0) + 1
+    }
+    const teamDistribution = Object.entries(roleMap).map(([name, value]) => ({ name, value }))
+
     return {
       totalProjects: mockProjects.length,
       activeProjects,
@@ -698,6 +750,11 @@ export const dashboardAPI = {
       averageProgress: mockProjects.length > 0 ? (mockProjects.reduce((sum, p) => sum + p.progress, 0) / mockProjects.length) : 0,
       recentProjects,
       upcomingDeadlines,
+      // Chart data
+      budgetTrend: generateBudgetTrend(),
+      projectProgress,
+      budgetByCategory,
+      teamDistribution,
       // Estadísticas de herramientas/equipos
       availableEquipment: mockEquipmentStats.availableEquipment,
       inMaintenanceEquipment: mockEquipmentStats.inMaintenanceEquipment,
@@ -711,6 +768,45 @@ export const dashboardAPI = {
       toolsUtilization: (mockEquipmentStats.totalTools ?? mockEquipmentStats.totalEquipment) > 0 ?
         (((mockEquipmentStats.totalTools ?? mockEquipmentStats.totalEquipment) - (mockEquipmentStats.availableTools ?? mockEquipmentStats.availableEquipment)) / (mockEquipmentStats.totalTools ?? mockEquipmentStats.totalEquipment)) * 100 : 0
     }
+  },
+
+  async exportDashboard(format = 'pdf', timeFilter = 'month') {
+    await delay(1000) // Simulate export processing
+    const data = await this.getStats(timeFilter)
+    
+    // In a real implementation, this would generate the actual file
+    const exportData = {
+      format,
+      timeFilter,
+      generatedAt: new Date().toISOString(),
+      data: {
+        summary: {
+          totalProjects: data.totalProjects,
+          activeProjects: data.activeProjects,
+          totalBudget: data.totalBudget,
+          budgetUtilization: data.budgetUtilization
+        },
+        charts: {
+          budgetTrend: data.budgetTrend,
+          projectProgress: data.projectProgress,
+          budgetByCategory: data.budgetByCategory,
+          teamDistribution: data.teamDistribution
+        }
+      }
+    }
+
+    // Simulate file download
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `dashboard-report-${timeFilter}-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+
+    return { success: true, filename: a.download }
   },
 
   async addIncome({ projectId, amount, date, description, category = 'General' }) {

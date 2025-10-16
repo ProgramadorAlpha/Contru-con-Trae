@@ -31,6 +31,8 @@
   },
   "include": [
     "src",
-    "api"
-  ]
+    "api",
+    "src/test/vitest-dom.d.ts"
+  ],
+  "types": ["vitest/globals", "@testing-library/jest-dom"]
 }

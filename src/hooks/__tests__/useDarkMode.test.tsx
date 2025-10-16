@@ -39,7 +39,7 @@ describe('useDarkMode', () => {
   )
 
   const wrapperWithTheme = (theme: 'light' | 'dark' | 'system') => ({ children }: { children: React.ReactNode }) => (
-    React.createElement(ThemeProvider, { defaultTheme: theme }, children)
+    React.createElement(ThemeProvider, { defaultTheme: theme, children })
   )
 
   describe('Hook initialization', () => {

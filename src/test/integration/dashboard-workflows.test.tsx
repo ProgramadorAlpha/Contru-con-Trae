@@ -263,7 +263,7 @@ describe('Dashboard Integration Workflows', () => {
       vi.mocked(await import('@/hooks/useDashboardSettings')).useDashboardSettings.mockReturnValue({
         widgets: mockWidgets,
         settings: {
-          widgets: [],
+          widgets: mockWidgets,
           preferences: {
             defaultTimeFilter: 'month',
             autoRefresh: true,
@@ -275,11 +275,13 @@ describe('Dashboard Integration Workflows', () => {
             compactMode: false
           }
         },
-
-        updateWidget: vi.fn(),
-        updatePreferences: vi.fn(),
-        updateLayout: vi.fn(),
-        resetSettings: vi.fn()
+        isOpen: false,
+        setIsOpen: vi.fn(),
+        saveSettings: vi.fn(),
+        updateSettings: vi.fn(),
+        resetToDefault: vi.fn(),
+        exportSettings: vi.fn(),
+        importSettings: vi.fn()
       })
 
       render(<EnhancedDashboard />)

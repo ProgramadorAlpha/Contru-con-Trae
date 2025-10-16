@@ -154,7 +154,12 @@ describe('useDashboardSettings', () => {
     // First modify settings
     act(() => {
       result.current.updateSettings({
-        preferences: { defaultTimeFilter: 'year' }
+        preferences: { 
+          defaultTimeFilter: 'year',
+          autoRefresh: false,
+          refreshInterval: 30000,
+          notificationsEnabled: true
+        }
       })
     })
     
@@ -311,7 +316,12 @@ describe('useDashboardSettings', () => {
     
     act(() => {
       result.current.updateSettings({
-        preferences: { defaultTimeFilter: 'week' }
+        preferences: { 
+          defaultTimeFilter: 'week',
+          autoRefresh: true,
+          refreshInterval: 30000,
+          notificationsEnabled: true
+        }
       })
     })
     
@@ -653,7 +663,12 @@ describe('useDashboardSettings', () => {
       // Modify settings
       act(() => {
         result.current.updateSettings({
-          preferences: { defaultTimeFilter: 'year' }
+          preferences: { 
+            defaultTimeFilter: 'year',
+            autoRefresh: false,
+            refreshInterval: 30000,
+            notificationsEnabled: true
+          }
         })
       })
 

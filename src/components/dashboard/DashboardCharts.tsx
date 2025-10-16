@@ -189,19 +189,21 @@ const DashboardCharts = memo(function DashboardCharts({
               Gráfico de área que muestra la utilización del presupuesto a lo largo del tiempo. 
               Compara el presupuesto asignado con el gasto real para el período seleccionado.
             </div>
-            <ResponsiveContainer width="100%" height={300} minHeight={250}>
-              <AreaChart 
-                data={processedBudgetData}
-                onClick={(data) => handleChartClick(data, 'budget')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    handleChartClick(e, 'budget')
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                aria-label="Gráfico interactivo de utilización de presupuesto. Presiona Enter para interactuar."
-              >
+            <div
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleChartClick(e, 'budget')
+                }
+              }}
+              tabIndex={0}
+              role="button"
+              aria-label="Gráfico interactivo de utilización de presupuesto. Presiona Enter para interactuar."
+            >
+              <ResponsiveContainer width="100%" height={300} minHeight={250}>
+                <AreaChart 
+                  data={processedBudgetData}
+                  onClick={(data) => handleChartClick(data, 'budget')}
+                >
               <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
               <XAxis 
                 dataKey="period" 
@@ -255,6 +257,7 @@ const DashboardCharts = memo(function DashboardCharts({
               )}
             </AreaChart>
           </ResponsiveContainer>
+            </div>
           </div>
         </ChartErrorBoundary>
       </div>
@@ -286,19 +289,21 @@ const DashboardCharts = memo(function DashboardCharts({
               Gráfico de barras que muestra el progreso de cada proyecto activo. 
               Cada barra representa el porcentaje de completitud de un proyecto específico.
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart 
-                data={safeProjectProgressData}
-                onClick={(data) => handleChartClick(data, 'projects')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    handleChartClick(e, 'projects')
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                aria-label="Gráfico interactivo de progreso de proyectos. Presiona Enter para interactuar."
-              >
+            <div
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleChartClick(e, 'projects')
+                }
+              }}
+              tabIndex={0}
+              role="button"
+              aria-label="Gráfico interactivo de progreso de proyectos. Presiona Enter para interactuar."
+            >
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart 
+                  data={safeProjectProgressData}
+                  onClick={(data) => handleChartClick(data, 'projects')}
+                >
               <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
               <XAxis 
                 dataKey="name" 
@@ -333,6 +338,7 @@ const DashboardCharts = memo(function DashboardCharts({
               />
             </BarChart>
           </ResponsiveContainer>
+            </div>
           </div>
         </ChartErrorBoundary>
       </div>

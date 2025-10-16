@@ -33,8 +33,9 @@ describe('Filters and Export Integration', () => {
       data: mockDashboardData,
       loading: false,
       error: null,
+      currentFilter: 'month',
       exportData: mockExportData,
-      refetch: mockRefetch
+      loadData: mockRefetch
     })
     
     // Mock useNotifications
@@ -49,10 +50,16 @@ describe('Filters and Export Integration', () => {
       addNotification: mockAddNotification,
       config: {
         enabled: true,
-        enableSound: false,
-        enableDesktop: false,
-        maxNotifications: 50
+        types: {
+          info: true,
+          warning: true,
+          success: true,
+          error: true
+        },
+        sound: false,
+        desktop: false
       },
+      clearAll: vi.fn(),
       updateConfig: vi.fn()
     })
     
@@ -62,10 +69,29 @@ describe('Filters and Export Integration', () => {
         { id: 'stats', name: 'Stats', description: 'Stats widget', enabled: true, position: 1 },
         { id: 'charts', name: 'Charts', description: 'Charts widget', enabled: true, position: 2 }
       ],
+      settings: {
+        widgets: [
+          { id: 'stats', name: 'Stats', description: 'Stats widget', enabled: true, position: 1 },
+          { id: 'charts', name: 'Charts', description: 'Charts widget', enabled: true, position: 2 }
+        ],
+        preferences: {
+          defaultTimeFilter: 'month',
+          autoRefresh: false,
+          refreshInterval: 30000,
+          notificationsEnabled: true
+        },
+        layout: {
+          gridColumns: 4,
+          compactMode: false
+        }
+      },
       isOpen: false,
       setIsOpen: vi.fn(),
       saveSettings: vi.fn(),
-      resetToDefault: vi.fn()
+      updateSettings: vi.fn(),
+      resetToDefault: vi.fn(),
+      exportSettings: vi.fn(),
+      importSettings: vi.fn()
     })
   })
 

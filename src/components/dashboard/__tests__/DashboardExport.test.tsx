@@ -31,8 +31,9 @@ describe('Dashboard Export Functionality', () => {
       data: mockDashboardData,
       loading: false,
       error: null,
+      currentFilter: 'month',
       exportData: mockExportData,
-      refetch: vi.fn()
+      loadData: vi.fn()
     })
     
     // Mock useNotifications
@@ -47,10 +48,16 @@ describe('Dashboard Export Functionality', () => {
       addNotification: mockAddNotification,
       config: {
         enabled: true,
-        enableSound: false,
-        enableDesktop: false,
-        maxNotifications: 50
+        types: {
+          info: true,
+          warning: true,
+          success: true,
+          error: true
+        },
+        sound: false,
+        desktop: false
       },
+      clearAll: vi.fn(),
       updateConfig: vi.fn()
     })
     
@@ -60,10 +67,29 @@ describe('Dashboard Export Functionality', () => {
         { id: 'stats', name: 'Stats', description: 'Stats widget', enabled: true, position: 1 },
         { id: 'charts', name: 'Charts', description: 'Charts widget', enabled: true, position: 2 }
       ],
+      settings: {
+        widgets: [
+          { id: 'stats', name: 'Stats', description: 'Stats widget', enabled: true, position: 1 },
+          { id: 'charts', name: 'Charts', description: 'Charts widget', enabled: true, position: 2 }
+        ],
+        preferences: {
+          defaultTimeFilter: 'month',
+          autoRefresh: false,
+          refreshInterval: 30000,
+          notificationsEnabled: true
+        },
+        layout: {
+          gridColumns: 4,
+          compactMode: false
+        }
+      },
       isOpen: false,
       setIsOpen: vi.fn(),
       saveSettings: vi.fn(),
-      resetToDefault: vi.fn()
+      updateSettings: vi.fn(),
+      resetToDefault: vi.fn(),
+      exportSettings: vi.fn(),
+      importSettings: vi.fn()
     })
   })
 
@@ -310,8 +336,9 @@ describe('Dashboard Export Functionality', () => {
         data: null,
         loading: false,
         error: null,
+        currentFilter: 'month',
         exportData: mockExportData,
-        refetch: vi.fn()
+        loadData: vi.fn()
       })
       
       render(<UnifiedDashboard />)

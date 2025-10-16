@@ -1,6 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { useDashboardData } from '../useDashboardData'
+import type { TimeFilter } from '@/types/dashboard'
 
 describe('useDashboardData - Auto-refresh functionality', () => {
   beforeEach(() => {
@@ -245,11 +246,11 @@ describe('useDashboardData - Auto-refresh functionality', () => {
 
     it('should respect user filter changes', async () => {
       const { result, rerender } = renderHook(
-        ({ filter }) => useDashboardData(filter, undefined, {
+        ({ filter }: { filter: TimeFilter }) => useDashboardData(filter, undefined, {
           autoRefresh: true,
           refreshInterval: 30000
         }),
-        { initialProps: { filter: 'month' as const } }
+        { initialProps: { filter: 'month' as TimeFilter } }
       )
 
       // Wait for initial load
@@ -258,7 +259,7 @@ describe('useDashboardData - Auto-refresh functionality', () => {
       }, { timeout: 2000 })
 
       // User changes filter
-      rerender({ filter: 'week' as const })
+      rerender({ filter: 'week' as TimeFilter })
 
       // Filter should be updated
       await waitFor(() => {
@@ -348,11 +349,11 @@ describe('useDashboardData - Auto-refresh functionality', () => {
   describe('integration with other features', () => {
     it('should work with time filter changes', async () => {
       const { result, rerender } = renderHook(
-        ({ filter }) => useDashboardData(filter, undefined, {
+        ({ filter }: { filter: TimeFilter }) => useDashboardData(filter, undefined, {
           autoRefresh: true,
           refreshInterval: 30000
         }),
-        { initialProps: { filter: 'month' as const } }
+        { initialProps: { filter: 'month' as TimeFilter } }
       )
 
       // Wait for initial load
@@ -361,7 +362,7 @@ describe('useDashboardData - Auto-refresh functionality', () => {
       }, { timeout: 2000 })
 
       // Change filter
-      rerender({ filter: 'week' as const })
+      rerender({ filter: 'week' as TimeFilter })
 
       // Should update with new filter
       await waitFor(() => {

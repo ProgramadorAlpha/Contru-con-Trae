@@ -42,44 +42,34 @@ export const documentAdvancedAPI = {
     return [
       {
         id: 'int-1',
-        name: 'Proyecto Construcción Torre A',
-        type: 'project',
-        status: 'active',
         documentId,
-        externalId: 'proj-123',
-        externalData: {
+        type: 'project',
+        targetId: 'proj-123',
+        targetName: 'Proyecto Construcción Torre A',
+        targetType: 'project',
+        status: 'linked',
+        metadata: {
           projectName: 'Torre A Residencial',
           projectManager: 'Juan Pérez',
           startDate: '2024-01-01',
           endDate: '2024-12-31'
-        },
-        syncSettings: {
-          autoSync: true,
-          syncInterval: 3600,
-          lastSync: new Date(),
-          syncDirection: 'bidirectional'
         },
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         id: 'int-2',
-        name: 'Tarea: Revisión de Planos',
-        type: 'task',
-        status: 'active',
         documentId,
-        externalId: 'task-456',
-        externalData: {
+        type: 'task',
+        targetId: 'task-456',
+        targetName: 'Tarea: Revisión de Planos',
+        targetType: 'task',
+        status: 'linked',
+        metadata: {
           taskName: 'Revisión de Planos Estructurales',
           assignedTo: 'María García',
           dueDate: '2024-02-15',
           priority: 'high'
-        },
-        syncSettings: {
-          autoSync: true,
-          syncInterval: 1800,
-          lastSync: new Date(),
-          syncDirection: 'bidirectional'
         },
         createdAt: new Date(),
         updatedAt: new Date()
@@ -91,19 +81,13 @@ export const documentAdvancedAPI = {
     await delay(400);
     const newIntegration: DocumentIntegration = {
       id: generateId(),
-      name: integration.name || '',
-      type: integration.type || 'project',
-      status: 'pending',
       documentId: integration.documentId || '',
-      externalId: integration.externalId || '',
-      externalData: integration.externalData || {},
-      syncSettings: {
-        autoSync: true,
-        syncInterval: 3600,
-        lastSync: new Date(),
-        syncDirection: 'bidirectional',
-        ...integration.syncSettings
-      },
+      type: integration.type || 'project',
+      targetId: integration.targetId || '',
+      targetName: integration.targetName || '',
+      targetType: integration.targetType || 'project',
+      status: 'pending',
+      metadata: integration.metadata || {},
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -114,18 +98,13 @@ export const documentAdvancedAPI = {
     await delay(300);
     return {
       id: integrationId,
-      name: updates.name || 'Updated Integration',
-      type: updates.type || 'project',
-      status: updates.status || 'active',
       documentId: updates.documentId || 'doc-1',
-      externalId: updates.externalId || '',
-      externalData: updates.externalData || {},
-      syncSettings: updates.syncSettings || {
-        autoSync: true,
-        syncInterval: 3600,
-        lastSync: new Date(),
-        syncDirection: 'bidirectional'
-      },
+      type: updates.type || 'project',
+      targetId: updates.targetId || '',
+      targetName: updates.targetName || 'Updated Integration',
+      targetType: updates.targetType || 'project',
+      status: updates.status || 'linked',
+      metadata: updates.metadata || {},
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -147,14 +126,8 @@ export const documentAdvancedAPI = {
         status: 'active',
         startDate: '2024-01-01',
         endDate: '2024-12-31',
-        projectManager: 'Juan Pérez',
         budget: 5000000,
-        currency: 'USD',
-        progress: 35,
-        documents: ['doc-1', 'doc-2', 'doc-3'],
-        tasks: ['task-1', 'task-2', 'task-3'],
-        createdAt: new Date(),
-        updatedAt: new Date()
+        documents: []
       }
     ];
   },
@@ -174,15 +147,10 @@ export const documentAdvancedAPI = {
         description: 'Revisar y aprobar planos estructurales del proyecto',
         status: 'pending',
         priority: 'high',
-        assignedTo: 'María García',
+        assignee: 'María García',
         dueDate: '2024-02-15',
         projectId: 'proj-1',
-        documents: ['doc-1'],
-        progress: 0,
-        estimatedHours: 8,
-        actualHours: 0,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        documents: []
       }
     ];
   },
@@ -199,18 +167,12 @@ export const documentAdvancedAPI = {
       {
         id: 'budget-1',
         name: 'Presupuesto Construcción Torre A',
-        description: 'Presupuesto general del proyecto',
         totalAmount: 5000000,
-        currency: 'USD',
-        allocatedAmount: 1750000,
+        usedAmount: 1750000,
         remainingAmount: 3250000,
+        status: 'active',
         projectId: 'proj-1',
-        documents: ['doc-1'],
-        status: 'approved',
-        startDate: '2024-01-01',
-        endDate: '2024-12-31',
-        createdAt: new Date(),
-        updatedAt: new Date()
+        documents: []
       }
     ];
   },
@@ -244,46 +206,114 @@ export const documentAdvancedAPI = {
       {
         id: 'role-1',
         name: 'Admin',
-        description: 'Administrador con todos los permisos',
-        permissions: ['read', 'write', 'delete', 'share', 'admin'],
         level: 1,
-        isSystem: true,
-        documentId,
-        createdAt: new Date(),
-        createdBy: 'system'
+        permissions: {
+          documents: {
+            view: true,
+            create: true,
+            edit: true,
+            delete: true,
+            share: true,
+            annotate: true,
+            version: true,
+            export: true,
+            print: true
+          },
+          admin: {
+            manageUsers: true,
+            manageRoles: true,
+            manageSecurity: true,
+            viewAuditLogs: true,
+            manageIntegrations: true
+          }
+        },
+        description: 'Administrador con todos los permisos',
+        isActive: true,
+        createdAt: new Date()
       },
       {
         id: 'role-2',
         name: 'Manager',
-        description: 'Gerente con permisos de gestión',
-        permissions: ['read', 'write', 'share', 'approve'],
         level: 2,
-        isSystem: false,
-        documentId,
-        createdAt: new Date(),
-        createdBy: 'admin'
+        permissions: {
+          documents: {
+            view: true,
+            create: true,
+            edit: true,
+            delete: false,
+            share: true,
+            annotate: true,
+            version: true,
+            export: true,
+            print: true
+          },
+          admin: {
+            manageUsers: false,
+            manageRoles: false,
+            manageSecurity: false,
+            viewAuditLogs: true,
+            manageIntegrations: false
+          }
+        },
+        description: 'Gerente con permisos de gestión',
+        isActive: true,
+        createdAt: new Date()
       },
       {
         id: 'role-3',
         name: 'Editor',
-        description: 'Editor con permisos de edición',
-        permissions: ['read', 'write'],
         level: 3,
-        isSystem: false,
-        documentId,
-        createdAt: new Date(),
-        createdBy: 'admin'
+        permissions: {
+          documents: {
+            view: true,
+            create: true,
+            edit: true,
+            delete: false,
+            share: false,
+            annotate: true,
+            version: false,
+            export: true,
+            print: true
+          },
+          admin: {
+            manageUsers: false,
+            manageRoles: false,
+            manageSecurity: false,
+            viewAuditLogs: false,
+            manageIntegrations: false
+          }
+        },
+        description: 'Editor con permisos de edición',
+        isActive: true,
+        createdAt: new Date()
       },
       {
         id: 'role-4',
         name: 'Viewer',
-        description: 'Visualizador con permisos de lectura',
-        permissions: ['read'],
         level: 4,
-        isSystem: false,
-        documentId,
-        createdAt: new Date(),
-        createdBy: 'admin'
+        permissions: {
+          documents: {
+            view: true,
+            create: false,
+            edit: false,
+            delete: false,
+            share: false,
+            annotate: false,
+            version: false,
+            export: false,
+            print: true
+          },
+          admin: {
+            manageUsers: false,
+            manageRoles: false,
+            manageSecurity: false,
+            viewAuditLogs: false,
+            manageIntegrations: false
+          }
+        },
+        description: 'Visualizador con permisos de lectura',
+        isActive: true,
+        createdAt: new Date()
       }
     ];
   },
@@ -293,13 +323,30 @@ export const documentAdvancedAPI = {
     return {
       id: generateId(),
       name: role.name || '',
-      description: role.description || '',
-      permissions: role.permissions || ['read'],
       level: role.level || 5,
-      isSystem: false,
-      documentId: role.documentId || '',
-      createdAt: new Date(),
-      createdBy: 'current-user'
+      permissions: role.permissions || {
+        documents: {
+          view: true,
+          create: false,
+          edit: false,
+          delete: false,
+          share: false,
+          annotate: false,
+          version: false,
+          export: false,
+          print: false
+        },
+        admin: {
+          manageUsers: false,
+          manageRoles: false,
+          manageSecurity: false,
+          viewAuditLogs: false,
+          manageIntegrations: false
+        }
+      },
+      description: role.description || '',
+      isActive: true,
+      createdAt: new Date()
     };
   },
 
@@ -310,24 +357,44 @@ export const documentAdvancedAPI = {
       {
         id: 'rule-1',
         name: 'Encriptación de documentos sensibles',
-        type: 'encryption',
-        condition: 'document.confidentiality === "secret"',
-        action: 'encrypt',
+        type: 'document',
+        targetId: documentId,
+        conditions: {
+          securityLevels: ['confidential', 'restricted']
+        },
+        actions: {
+          allowAccess: true,
+          requireApproval: false,
+          requireMFA: true,
+          encryptDocument: true,
+          addWatermark: true
+        },
+        priority: 1,
         isActive: true,
-        documentId,
-        createdAt: new Date(),
-        createdBy: 'admin'
+        createdBy: 'admin',
+        createdAt: new Date()
       },
       {
         id: 'rule-2',
         name: 'Restricción por ubicación geográfica',
-        type: 'geo-restriction',
-        condition: 'user.location !== "approved-country"',
-        action: 'block',
+        type: 'global',
+        targetId: 'global',
+        conditions: {
+          locationRestrictions: {
+            allowedCountries: ['US', 'MX', 'ES']
+          }
+        },
+        actions: {
+          allowAccess: false,
+          requireApproval: true,
+          requireMFA: false,
+          encryptDocument: false,
+          addWatermark: false
+        },
+        priority: 2,
         isActive: true,
-        documentId,
-        createdAt: new Date(),
-        createdBy: 'admin'
+        createdBy: 'admin',
+        createdAt: new Date()
       }
     ];
   },
@@ -337,13 +404,20 @@ export const documentAdvancedAPI = {
     return {
       id: generateId(),
       name: rule.name || '',
-      type: rule.type || 'access',
-      condition: rule.condition || '',
-      action: rule.action || 'allow',
+      type: rule.type || 'document',
+      targetId: rule.targetId || '',
+      conditions: rule.conditions || {},
+      actions: rule.actions || {
+        allowAccess: true,
+        requireApproval: false,
+        requireMFA: false,
+        encryptDocument: false,
+        addWatermark: false
+      },
+      priority: rule.priority || 10,
       isActive: rule.isActive ?? true,
-      documentId: rule.documentId || '',
-      createdAt: new Date(),
-      createdBy: 'current-user'
+      createdBy: rule.createdBy || 'current-user',
+      createdAt: new Date()
     };
   },
 
@@ -352,21 +426,19 @@ export const documentAdvancedAPI = {
     await delay(300);
     return Array.from({ length: limit }, (_, i) => ({
       id: `log-${i}`,
+      documentId,
       userId: `user-${Math.floor(Math.random() * 5) + 1}`,
       userName: ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez', 'Luis Rodríguez'][Math.floor(Math.random() * 5)],
       userEmail: ['juan@example.com', 'maria@example.com', 'carlos@example.com', 'ana@example.com', 'luis@example.com'][Math.floor(Math.random() * 5)],
-      action: ['view', 'download', 'edit', 'share'][Math.floor(Math.random() * 4)],
-      resource: documentId,
+      action: ['view', 'download', 'edit', 'share'][Math.floor(Math.random() * 4)] as 'view' | 'edit' | 'download' | 'share',
       timestamp: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000), // Últimos 7 días
       ipAddress: `192.168.1.${Math.floor(Math.random() * 255)}`,
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       location: {
         country: ['US', 'MX', 'ES', 'AR', 'CO'][Math.floor(Math.random() * 5)],
         city: ['New York', 'México City', 'Madrid', 'Buenos Aires', 'Bogotá'][Math.floor(Math.random() * 5)],
-        coordinates: {
-          latitude: Math.random() * 180 - 90,
-          longitude: Math.random() * 360 - 180
-        }
+        latitude: Math.random() * 180 - 90,
+        longitude: Math.random() * 360 - 180
       },
       success: Math.random() > 0.1, // 90% de éxito
       metadata: {
@@ -555,23 +627,25 @@ export const documentAdvancedAPI = {
         id: 'branch-1',
         name: 'main',
         documentId,
+        isMain: true,
         isProtected: true,
-        isDefault: true,
-        lastCommit: 'v2',
         createdAt: new Date('2024-01-01'),
         createdBy: 'Juan Pérez',
-        description: 'Rama principal de desarrollo'
+        lastModified: new Date(),
+        description: 'Rama principal de desarrollo',
+        versions: []
       },
       {
         id: 'branch-2',
         name: 'feature/new-design',
         documentId,
+        isMain: false,
         isProtected: false,
-        isDefault: false,
-        lastCommit: 'v3',
         createdAt: new Date('2024-01-20'),
         createdBy: 'Carlos López',
-        description: 'Nuevo diseño de interfaz'
+        lastModified: new Date(),
+        description: 'Nuevo diseño de interfaz',
+        versions: []
       }
     ];
   },
@@ -582,12 +656,13 @@ export const documentAdvancedAPI = {
       id: generateId(),
       name: branch.name || '',
       documentId: branch.documentId || '',
+      isMain: branch.isMain || false,
       isProtected: branch.isProtected || false,
-      isDefault: branch.isDefault || false,
-      lastCommit: branch.lastCommit || '',
       createdAt: new Date(),
       createdBy: branch.createdBy || 'current-user',
-      description: branch.description || ''
+      lastModified: new Date(),
+      description: branch.description || '',
+      versions: branch.versions || []
     };
   },
 
@@ -597,11 +672,12 @@ export const documentAdvancedAPI = {
       id: generateId(),
       sourceBranch,
       targetBranch,
+      sourceVersion: options.sourceVersion || 'v1',
+      targetVersion: options.targetVersion || 'v2',
       mergedBy: 'current-user',
       mergedAt: new Date(),
       conflicts: [],
-      status: 'success',
-      mergeStrategy: options.strategy || 'recursive'
+      status: 'completed'
     };
   },
 
@@ -614,9 +690,10 @@ export const documentAdvancedAPI = {
         name: 'v1.0.0',
         description: 'Primera versión estable',
         versionId: 'v1',
-        documentId,
+        branchId: 'branch-1',
         createdAt: new Date('2024-01-01'),
-        createdBy: 'Juan Pérez'
+        createdBy: 'Juan Pérez',
+        isRelease: true
       }
     ];
   },
@@ -628,9 +705,10 @@ export const documentAdvancedAPI = {
       name: tag.name || '',
       description: tag.description || '',
       versionId: tag.versionId || '',
-      documentId: tag.documentId || '',
+      branchId: tag.branchId || '',
       createdAt: new Date(),
-      createdBy: tag.createdBy || 'current-user'
+      createdBy: tag.createdBy || 'current-user',
+      isRelease: tag.isRelease || false
     };
   },
 
@@ -658,28 +736,34 @@ export const documentAdvancedAPI = {
   async getDocumentAnalytics(documentId: string, timeRange: string): Promise<DocumentAnalytics> {
     await delay(400);
     return {
+      id: generateId(),
       documentId,
-      timeRange,
       views: Math.floor(Math.random() * 1000),
       downloads: Math.floor(Math.random() * 100),
       shares: Math.floor(Math.random() * 50),
       annotations: Math.floor(Math.random() * 30),
-      collaborators: Math.floor(Math.random() * 20),
-      averageTimeSpent: Math.floor(Math.random() * 300) + 60,
-      topContributors: [
-        { userId: 'user-1', name: 'Juan Pérez', contributions: 25 },
-        { userId: 'user-2', name: 'María García', contributions: 18 }
+      versions: Math.floor(Math.random() * 10),
+      uniqueViewers: Math.floor(Math.random() * 50),
+      averageViewTime: Math.floor(Math.random() * 300) + 60,
+      lastAccessed: new Date(),
+      accessByRole: {
+        'admin': 25,
+        'editor': 18,
+        'viewer': 42
+      },
+      accessByDepartment: {
+        'Engineering': 30,
+        'Architecture': 25,
+        'Management': 15
+      },
+      peakAccessTime: '14:00',
+      geographicAccess: [
+        { country: 'US', count: 50 },
+        { country: 'MX', count: 30 },
+        { country: 'ES', count: 20 }
       ],
-      usageByTime: Array.from({ length: 24 }, (_, i) => ({
-        hour: i,
-        views: Math.floor(Math.random() * 50)
-      })),
-      popularSections: [
-        { section: 'Introducción', views: 150 },
-        { section: 'Metodología', views: 120 },
-        { section: 'Resultados', views: 200 }
-      ],
-      generatedAt: new Date()
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
   },
 
@@ -687,21 +771,18 @@ export const documentAdvancedAPI = {
   async classifyDocument(documentId: string): Promise<DocumentClassificationML> {
     await delay(1000);
     return {
+      id: generateId(),
       documentId,
-      categories: [
-        { category: 'Construction', confidence: 0.85 },
-        { category: 'Architecture', confidence: 0.72 },
-        { category: 'Engineering', confidence: 0.68 }
-      ],
-      tags: [
-        { tag: 'building', confidence: 0.91 },
-        { tag: 'residential', confidence: 0.84 },
-        { tag: 'design', confidence: 0.76 }
-      ],
+      predictedCategory: 'Construction',
+      predictedTags: ['building', 'residential', 'design'],
       confidence: 0.82,
       modelVersion: 'v2.1.0',
-      processingTime: 1250,
-      processedAt: new Date()
+      features: {
+        fileName: 'document.pdf',
+        fileType: 'application/pdf',
+        fileSize: 1024000
+      },
+      createdAt: new Date()
     };
   },
 
@@ -714,20 +795,28 @@ export const documentAdvancedAPI = {
   async performOCR(documentId: string): Promise<OCRResult> {
     await delay(1500);
     return {
+      id: generateId(),
       documentId,
-      text: 'Este es el texto extraído del documento mediante OCR avanzado.',
-      confidence: 0.94,
+      content: 'Este es el texto extraído del documento mediante OCR avanzado.',
       pages: [
         {
           pageNumber: 1,
           text: 'Texto de la página 1',
-          confidence: 0.95
+          confidence: 0.95,
+          blocks: [
+            {
+              text: 'Texto de la página 1',
+              confidence: 0.95,
+              bbox: { x: 0, y: 0, width: 100, height: 20 }
+            }
+          ]
         }
       ],
       language: 'es',
+      confidence: 0.94,
       processingTime: 1450,
-      processedAt: new Date(),
-      searchable: true
+      engine: 'Tesseract',
+      createdAt: new Date()
     };
   },
 
@@ -751,19 +840,18 @@ export const documentAdvancedAPI = {
       {
         id: 'notif-1',
         userId,
-        type: 'document-update',
+        type: 'version_update',
         title: 'Documento actualizado',
         message: 'El documento "Planos Estructurales" ha sido actualizado',
+        relatedDocumentId: 'doc-1',
         priority: 'medium',
         isRead: false,
-        actionUrl: '/documents/doc-1',
+        actionRequired: false,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
         metadata: {
-          documentId: 'doc-1',
           version: '2.0.0',
           updatedBy: 'Juan Pérez'
         },
-        scheduledFor: new Date(),
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
         createdAt: new Date()
       }
     ];
@@ -774,15 +862,15 @@ export const documentAdvancedAPI = {
     return {
       id: generateId(),
       userId: notification.userId || '',
-      type: notification.type || 'info',
+      type: notification.type || 'document_shared',
       title: notification.title || '',
       message: notification.message || '',
+      relatedDocumentId: notification.relatedDocumentId || '',
       priority: notification.priority || 'low',
       isRead: false,
-      actionUrl: notification.actionUrl || '',
-      metadata: notification.metadata || {},
-      scheduledFor: notification.scheduledFor || new Date(),
+      actionRequired: notification.actionRequired || false,
       expiresAt: notification.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000),
+      metadata: notification.metadata || {},
       createdAt: new Date()
     };
   },
@@ -795,12 +883,14 @@ export const documentAdvancedAPI = {
       id: `backup-${generateId()}`,
       documentId,
       backupType: 'full',
-      size: Math.floor(Math.random() * 1000000) + 100000,
-      location: 's3://backups/documents/',
+      backupSize: Math.floor(Math.random() * 1000000) + 100000,
+      backupPath: 's3://backups/documents/',
       checksum: 'sha256:abc123def456',
       status: 'completed',
+      createdBy: 'system',
       createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 días
+      completedAt: new Date(),
+      retentionUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 días
       metadata: {
         versions: ['v1', 'v2'],
         annotations: 15,
@@ -816,12 +906,14 @@ export const documentAdvancedAPI = {
         id: 'backup-1',
         documentId,
         backupType: 'full',
-        size: 1024000,
-        location: 's3://backups/documents/',
+        backupSize: 1024000,
+        backupPath: 's3://backups/documents/',
         checksum: 'sha256:abc123def456',
         status: 'completed',
+        createdBy: 'system',
         createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-        expiresAt: new Date(Date.now() + 29 * 24 * 60 * 60 * 1000),
+        completedAt: new Date(Date.now() - 24 * 60 * 60 * 1000 + 60000),
+        retentionUntil: new Date(Date.now() + 29 * 24 * 60 * 60 * 1000),
         metadata: {
           versions: ['v1', 'v2'],
           annotations: 15,
@@ -842,24 +934,22 @@ export const documentAdvancedAPI = {
       id: 'drp-1',
       name: 'Plan de Recuperación de Desastres Principal',
       description: 'Plan principal para recuperación ante desastres',
-      rto: 4, // Recovery Time Objective: 4 horas
-      rpo: 1, // Recovery Point Objective: 1 hora
-      backupStrategy: '3-2-1',
-      storageLocations: [
+      backupSchedule: {
+        frequency: 'daily',
+        time: '02:00',
+        retention: 30
+      },
+      recoveryTimeObjective: 4, // Recovery Time Objective: 4 horas
+      recoveryPointObjective: 1, // Recovery Point Objective: 1 hora
+      backupLocations: [
         'primary-datacenter',
         'secondary-datacenter',
         'cloud-storage'
       ],
-      testingSchedule: 'monthly',
-      lastTested: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      contactInfo: {
-        primary: 'admin@company.com',
-        secondary: 'backup-admin@company.com',
-        emergency: '+1-555-0123'
-      },
       isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      lastTested: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      createdBy: 'admin',
+      createdAt: new Date('2024-01-01')
     };
   },
 

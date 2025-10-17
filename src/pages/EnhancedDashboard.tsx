@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import { Bell, AlertCircle, TrendingUp, Users, Calendar, Wrench } from 'lucide-react'
+import { Bell, AlertCircle, TrendingUp, Users, Calendar, Wrench, DollarSign } from 'lucide-react'
 import { useDarkMode } from '@/hooks/useDarkMode'
 import { useDashboardData } from '@/hooks/useDashboardData'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -10,6 +10,8 @@ import { DashboardCharts } from '@/components/dashboard/DashboardCharts'
 import { NotificationCenter } from '@/components/dashboard/NotificationCenter'
 import { DashboardSettingsLazy } from '@/components/dashboard/DashboardSettingsLazy'
 import { ChartErrorBoundary } from '@/components/dashboard/ChartErrorBoundary'
+import { ProfitabilityWidget } from '@/components/financials/ProfitabilityWidget'
+import { CommittedCostWidget } from '@/components/financials/CommittedCostWidget'
 import { 
   StatsCardSkeleton, 
   ChartSkeleton, 
@@ -205,6 +207,31 @@ export function EnhancedDashboard() {
         return (
           <div className="mb-8">
             <TeamPerformanceWidget data={data.teamPerformanceData} stats={data.stats} />
+          </div>
+        )
+      
+      case 'job-costing':
+        return (
+          <div className="mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ProfitabilityWidget
+                totalBudget={data?.stats?.totalBudget || 0}
+                actualCost={data?.stats?.totalBudget ? data.stats.totalBudget * 0.65 : 0}
+                forecastedFinalCost={data?.stats?.totalBudget ? data.stats.totalBudget * 0.85 : 0}
+              />
+              <CommittedCostWidget
+                committedCost={data?.stats?.totalBudget ? data.stats.totalBudget * 0.45 : 0}
+                totalBudget={data?.stats?.totalBudget || 0}
+                subcontracts={[]}
+              />
+            </div>
+          </div>
+        )
+      
+      case 'budget-alerts':
+        return (
+          <div className="mb-8">
+            <BudgetAlerts />
           </div>
         )
       
@@ -576,6 +603,72 @@ function DashboardError({ error, onRetry }: { error: string, onRetry: () => void
       >
         Reintentar
       </button>
+    </div>
+  )
+}
+
+function
+ BudgetAlerts() {
+  // Mock alerts - in real app would come from financial service
+  const alerts = [
+    {
+      id: '1',
+      type: 'warning',
+      title: 'Proyecto cerca del límite presupuestario',
+      message: 'El Proyecto Demo 1 ha utilizado el 92% de su presupuesto',
+      project: 'Proyecto Demo 1'
+    },
+    {
+      id: '2',
+      type: 'info',
+      title: 'Certificado pendiente de aprobación',
+      message: '3 certificados de progreso esperan aprobación',
+      project: 'Varios'
+    }
+  ]
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-900">Alertas Presupuestarias</h3>
+        <AlertCircle className="w-5 h-5 text-yellow-600" />
+      </div>
+      <div className="space-y-3">
+        {alerts.map((alert) => (
+          <div
+            key={alert.id}
+            className={cn(
+              'p-4 rounded-lg border',
+              alert.type === 'warning'
+                ? 'bg-yellow-50 border-yellow-200'
+                : 'bg-blue-50 border-blue-200'
+            )}
+          >
+            <div className="flex items-start gap-3">
+              {alert.type === 'warning' ? (
+                <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              ) : (
+                <DollarSign className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              )}
+              <div className="flex-1">
+                <h4 className={cn(
+                  'text-sm font-semibold mb-1',
+                  alert.type === 'warning' ? 'text-yellow-900' : 'text-blue-900'
+                )}>
+                  {alert.title}
+                </h4>
+                <p className={cn(
+                  'text-sm',
+                  alert.type === 'warning' ? 'text-yellow-800' : 'text-blue-800'
+                )}>
+                  {alert.message}
+                </p>
+                <p className="text-xs text-gray-600 mt-1">Proyecto: {alert.project}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

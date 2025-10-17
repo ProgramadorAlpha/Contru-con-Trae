@@ -16,7 +16,10 @@
     "deploy:prepare": "node scripts/deploy.js",
     "deploy:monitor": "node scripts/monitor-deployment.js",
     "deploy:verify": "npm run check && npm run lint && npm run test:run && npm run build",
-    "deploy:verify-dashboard": "node scripts/verify-dashboard-only.js"
+    "deploy:verify-dashboard": "node scripts/verify-dashboard-only.js",
+    "deploy:job-costing": "node scripts/deploy-job-costing.js",
+    "monitor:job-costing": "node scripts/monitor-job-costing.js",
+    "health-check": "node scripts/system-health-check.js"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.0",

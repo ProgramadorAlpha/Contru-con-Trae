@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, Eye, Calendar, DollarSign, MapPin, Building2 } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, Calendar, DollarSign, MapPin, Building2, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { projectAPI } from '@/lib/api'
 import { formatCurrency, formatDate } from '@/lib/chartUtils'
 
 export function ProjectsPage() {
+  const navigate = useNavigate()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -41,6 +43,17 @@ export function ProjectsPage() {
     if (progress >= 80) return 'bg-green-600'
     if (progress >= 50) return 'bg-yellow-600'
     return 'bg-red-600'
+  }
+
+  const getProfitabilityIndicator = (budget, spent) => {
+    const margin = ((budget - spent) / budget) * 100
+    if (margin >= 15) {
+      return { color: 'text-green-600', icon: TrendingUp, label: 'Saludable', bgColor: 'bg-green-50' }
+    } else if (margin >= 10) {
+      return { color: 'text-yellow-600', icon: AlertTriangle, label: 'Atención', bgColor: 'bg-yellow-50' }
+    } else {
+      return { color: 'text-red-600', icon: TrendingDown, label: 'Riesgo', bgColor: 'bg-red-50' }
+    }
   }
 
   if (loading) {
@@ -107,8 +120,8 @@ export function ProjectsPage() {
                 </div>
               </div>
 
-              {/* Budget Info */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              {/* Budget Info with Profitability */}
+              <div className="grid grid-cols-3 gap-4 mb-4">
                 <div>
                   <div className="text-sm text-gray-600">Presupuesto</div>
                   <div className="font-semibold text-gray-900">{formatCurrency(project.budget)}</div>
@@ -116,6 +129,21 @@ export function ProjectsPage() {
                 <div>
                   <div className="text-sm text-gray-600">Ejecutado</div>
                   <div className="font-semibold text-gray-900">{formatCurrency(project.spent)}</div>
+                </div>
+                <div>
+                  {(() => {
+                    const indicator = getProfitabilityIndicator(project.budget, project.spent)
+                    const Icon = indicator.icon
+                    return (
+                      <div className={`${indicator.bgColor} rounded-lg p-2`}>
+                        <div className="text-xs text-gray-600">Rentabilidad</div>
+                        <div className={`flex items-center gap-1 ${indicator.color} font-semibold text-sm`}>
+                          <Icon className="w-3 h-3" />
+                          {indicator.label}
+                        </div>
+                      </div>
+                    )
+                  })()}
                 </div>
               </div>
 
@@ -146,16 +174,25 @@ export function ProjectsPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end space-x-2 mt-4">
-                <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
-                  <Eye className="w-4 h-4" />
+              <div className="flex justify-between items-center mt-4 pt-4 border-t">
+                <button
+                  onClick={() => navigate(`/project-financials/${project.id}`)}
+                  className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  <DollarSign className="w-4 h-4" />
+                  Ver Financieros
                 </button>
-                <button className="p-2 text-gray-400 hover:text-green-600 transition-colors">
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-red-600 transition-colors">
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex space-x-2">
+                  <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button className="p-2 text-gray-400 hover:text-green-600 transition-colors">
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button className="p-2 text-gray-400 hover:text-red-600 transition-colors">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>

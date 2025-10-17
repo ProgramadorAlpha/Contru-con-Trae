@@ -734,3 +734,258 @@ VITE_SENTRY_DSN=your-sentry-dsn
 ---
 
 Esta documentación de API proporciona una referencia completa para todos los componentes, hooks, tipos y utilidades del sistema de dashboard mejorado. Para ejemplos más específicos y casos de uso avanzados, consulta la [documentación principal](./DASHBOARD_IMPROVEMENTS.md).
+
+
+---
+
+## Job Costing System API
+
+### OCR Expense Auto-Create Endpoint
+
+Automatically creates expenses from OCR-processed invoice data. Designed for integration with n8n automation workflows.
+
+#### Endpoint
+
+```
+POST /api/expenses/auto-create
+```
+
+#### Authentication
+
+Requires API key in header:
+```
+Authorization: Bearer YOUR_API_KEY
+```
+
+#### Request Headers
+
+```
+Content-Type: application/json
+X-Webhook-Signature: <HMAC signature for verification>
+```
+
+#### Request Body
+
+```typescript
+{
+  // OCR Extracted Data (Required)
+  "amount": 1250.00,              // Expense amount (required)
+  "taxAmount": 187.50,            // Tax amount (optional)
+  "date": "2024-01-15",           // Invoice date in ISO format (required)
+  "supplier": "ABC Supplies Inc", // Supplier name (required)
+  "description": "Construction materials for Project X", // Description (required)
+  "invoiceNumber": "INV-2024-001", // Invoice number (optional)
+  
+  // OCR Metadata (Required)
+  "ocrData": {
+    "confidence": 0.95,           // OCR confidence score 0-1 (required)
+    "rawText": "...",             // Raw OCR text (optional)
+    "extractedFields": {          // Extracted field details (optional)
+      "amount": { "value": 1250.00, "confidence": 0.98 },
+      "date": { "value": "2024-01-15", "confidence": 0.92 }
+    },
+    "processingTime": 1250        // OCR processing time in ms (optional)
+  },
+  
+  // File Data (Required)
+  "file": {
+    "name": "invoice_001.pdf",    // Original filename (required)
+    "mimeType": "application/pdf", // MIME type (required)
+    "data": "base64_encoded_data" // Base64 encoded file (required)
+  },
+  
+  // Optional Classification
+  "projectId": "proj-123",        // Project ID (optional, will auto-assign if missing)
+  "costCodeId": "cc-456",         // Cost code ID (optional, will auto-suggest if missing)
+  "supplierId": "sup-789",        // Supplier ID (optional, will try to match if missing)
+  
+  // Metadata
+  "source": "email",              // Source: 'email', 'upload', 'scan' (optional)
+  "sourceId": "email-msg-123"     // Reference to source (optional)
+}
+```
+
+#### Success Response (201 Created)
+
+```json
+{
+  "success": true,
+  "expenseId": "EXP-1234567890-abc123",
+  "message": "Expense created successfully",
+  "expense": {
+    "id": "EXP-1234567890-abc123",
+    "amount": 1437.50,
+    "supplier": "ABC Supplies Inc",
+    "description": "Construction materials for Project X",
+    "status": "pending_approval",
+    "needsReview": false,
+    "ocrConfidence": 0.95
+  },
+  "warnings": [
+    "Cost code was auto-suggested - please verify"
+  ]
+}
+```
+
+#### Error Response (400 Bad Request)
+
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "code": "VALIDATION_ERROR",
+  "validationErrors": [
+    {
+      "field": "amount",
+      "message": "Amount is required and must be greater than 0"
+    },
+    {
+      "field": "date",
+      "message": "Date must be in ISO format (YYYY-MM-DD)"
+    }
+  ]
+}
+```
+
+#### Error Codes
+
+| Code | Description |
+|------|-------------|
+| `VALIDATION_ERROR` | Request validation failed |
+| `OCR_MISSING_AMOUNT` | Amount not found in OCR data |
+| `OCR_MISSING_DATE` | Date not found in OCR data |
+| `OCR_MISSING_SUPPLIER` | Supplier not found in OCR data |
+| `OCR_MISSING_DESCRIPTION` | Description not found in OCR data |
+| `OCR_MISSING_FILE` | File data is missing |
+| `OCR_LOW_CONFIDENCE` | OCR confidence too low (< 0.3) |
+| `UNSUPPORTED_MEDIA_TYPE` | Content-Type must be application/json |
+| `RATE_LIMIT_EXCEEDED` | Too many requests |
+| `INTERNAL_ERROR` | Server error |
+
+#### Rate Limiting
+
+- **Limit**: 100 requests per minute per API key
+- **Response Header**: `X-RateLimit-Remaining`
+- **Error Response (429)**: 
+  ```json
+  {
+    "success": false,
+    "error": "Rate limit exceeded",
+    "code": "RATE_LIMIT_EXCEEDED",
+    "details": {
+      "limit": 100,
+      "window": "1 minute",
+      "retryAfter": 45
+    }
+  }
+  ```
+
+#### Webhook Signature Verification
+
+To verify the request comes from your n8n instance:
+
+1. n8n calculates HMAC-SHA256 of request body using shared secret
+2. Signature sent in `X-Webhook-Signature` header
+3. Server verifies signature before processing
+
+**Example (Node.js)**:
+```javascript
+const crypto = require('crypto')
+const signature = crypto
+  .createHmac('sha256', WEBHOOK_SECRET)
+  .update(JSON.stringify(requestBody))
+  .digest('hex')
+```
+
+#### Example n8n Workflow
+
+```json
+{
+  "nodes": [
+    {
+      "name": "Email Trigger",
+      "type": "n8n-nodes-base.emailReadImap",
+      "parameters": {
+        "mailbox": "INBOX",
+        "options": {
+          "attachments": true
+        }
+      }
+    },
+    {
+      "name": "OCR Processing",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://ocr-service.com/process",
+        "method": "POST"
+      }
+    },
+    {
+      "name": "Create Expense",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://your-app.com/api/expenses/auto-create",
+        "method": "POST",
+        "authentication": "headerAuth",
+        "headerAuth": {
+          "name": "Authorization",
+          "value": "Bearer YOUR_API_KEY"
+        },
+        "bodyParameters": {
+          "amount": "={{ $json.ocr.amount }}",
+          "date": "={{ $json.ocr.date }}",
+          "supplier": "={{ $json.ocr.supplier }}",
+          "description": "={{ $json.ocr.description }}",
+          "ocrData": "={{ $json.ocr.metadata }}",
+          "file": {
+            "name": "={{ $json.attachment.filename }}",
+            "mimeType": "={{ $json.attachment.mimeType }}",
+            "data": "={{ $json.attachment.data }}"
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+#### Best Practices
+
+1. **Always include OCR confidence**: Helps system determine if manual review is needed
+2. **Provide invoice number**: Improves tracking and prevents duplicates
+3. **Include source metadata**: Helps with auditing and troubleshooting
+4. **Handle low confidence**: Set up manual review workflow for confidence < 0.7
+5. **Implement retry logic**: Use exponential backoff for failed requests
+6. **Monitor rate limits**: Track `X-RateLimit-Remaining` header
+7. **Verify signatures**: Always verify webhook signatures in production
+
+#### Testing
+
+**cURL Example**:
+```bash
+curl -X POST https://your-app.com/api/expenses/auto-create \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -d '{
+    "amount": 1250.00,
+    "date": "2024-01-15",
+    "supplier": "Test Supplier",
+    "description": "Test expense",
+    "ocrData": {
+      "confidence": 0.95,
+      "extractedFields": {}
+    },
+    "file": {
+      "name": "test.pdf",
+      "mimeType": "application/pdf",
+      "data": "base64_test_data"
+    }
+  }'
+```
+
+#### Support
+
+For issues or questions:
+- Email: support@your-app.com
+- Documentation: https://docs.your-app.com
+- Status Page: https://status.your-app.com

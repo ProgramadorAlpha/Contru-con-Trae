@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen } from '@/test/utils'
 import { EnhancedDashboard } from '@/pages/EnhancedDashboard'
 
 // Simple mocks
@@ -37,26 +37,28 @@ vi.mock('@/hooks/useNotifications', () => ({
 
 vi.mock('@/hooks/useDashboardSettings', () => ({
   useDashboardSettings: vi.fn(() => ({
-    widgets: [],
-    settings: {
-      widgets: [],
-      preferences: {
-        defaultTimeFilter: 'month',
-        autoRefresh: true,
-        refreshInterval: 60000,
-        notificationsEnabled: true
-      },
-      layout: {
-        gridColumns: 3,
-        compactMode: false
-      }
+    widgets: [
+      { id: 'stats', name: 'Estadísticas', description: 'Estadísticas generales', enabled: true, position: 1 },
+      { id: 'charts', name: 'Gráficos', description: 'Gráficos interactivos', enabled: true, position: 2 }
+    ],
+    preferences: {
+      defaultTimeFilter: 'month',
+      autoRefresh: true,
+      refreshInterval: 60000,
+      notificationsEnabled: true
     },
-    isOpen: false,
-    setIsOpen: vi.fn(),
-    saveSettings: vi.fn(),
-    updateSettings: vi.fn(),
-    resetToDefault: vi.fn(),
-    exportSettings: vi.fn(),
+    layout: {
+      gridColumns: 3,
+      compactMode: false
+    },
+    updateWidget: vi.fn(),
+    updatePreferences: vi.fn(),
+    updateLayout: vi.fn(),
+    resetSettings: vi.fn(),
+    isModalOpen: false,
+    openModal: vi.fn(),
+    closeModal: vi.fn(),
+    exportSettings: vi.fn(() => '{}'),
     importSettings: vi.fn()
   }))
 }))

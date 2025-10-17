@@ -1,8 +1,8 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { DashboardCharts } from '../DashboardCharts'
-import type { DashboardData } from '@/types/dashboard'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 
 // Mock Recharts components
 vi.mock('recharts', () => ({
@@ -58,6 +58,14 @@ const mockExpensesByCategory = [
   { name: 'Otros', value: 50000, color: '#EF4444' }
 ]
 
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <ThemeProvider>
+      {ui}
+    </ThemeProvider>
+  )
+}
+
 describe('DashboardCharts', () => {
   const defaultProps = {
     budgetData: mockBudgetData,
@@ -73,30 +81,30 @@ describe('DashboardCharts', () => {
   })
 
   it('renders all chart components when data is provided', () => {
-    render(<DashboardCharts {...defaultProps} />)
+    renderWithProviders(<DashboardCharts {...defaultProps} />)
     
-    expect(screen.getByText('Utilización del Presupuesto')).toBeInTheDocument()
+    expect(screen.getByText('Utilización de Presupuesto')).toBeInTheDocument()
     expect(screen.getByText('Progreso de Proyectos')).toBeInTheDocument()
     expect(screen.getByText('Rendimiento del Equipo')).toBeInTheDocument()
-    expect(screen.getByText('Distribución de Gastos')).toBeInTheDocument()
+    expect(screen.getByText('Gastos por Categoría')).toBeInTheDocument()
     
     expect(screen.getAllByTestId('responsive-container')).toHaveLength(4)
   })
 
   it('displays loading skeletons when loading is true', () => {
-    render(<DashboardCharts {...defaultProps} loading={true} />)
+    renderWithProviders(<DashboardCharts {...defaultProps} loading={true} />)
     
     // Should show skeleton loaders instead of charts
-    expect(screen.queryByText('Utilización del Presupuesto')).not.toBeInTheDocument()
+    expect(screen.queryByText('Utilización de Presupuesto')).not.toBeInTheDocument()
     expect(screen.queryByTestId('area-chart')).not.toBeInTheDocument()
   })
 
   it('handles errors through error boundary', () => {
     // Error handling is done through ChartErrorBoundary
     // This test verifies the component renders without crashing
-    render(<DashboardCharts {...defaultProps} />)
+    renderWithProviders(<DashboardCharts {...defaultProps} />)
     
-    expect(screen.getByText('Utilización del Presupuesto')).toBeInTheDocument()
+    expect(screen.getByText('Utilización de Presupuesto')).toBeInTheDocument()
   })
 
   it('handles empty data gracefully', () => {
@@ -109,23 +117,23 @@ describe('DashboardCharts', () => {
       loading: false
     }
     
-    render(<DashboardCharts {...emptyProps} />)
+    renderWithProviders(<DashboardCharts {...emptyProps} />)
     
     // Should still render chart containers
-    expect(screen.getByText('Utilización del Presupuesto')).toBeInTheDocument()
+    expect(screen.getByText('Utilización de Presupuesto')).toBeInTheDocument()
     expect(screen.getAllByTestId('responsive-container')).toHaveLength(4)
   })
 
   it('formats currency values correctly in tooltips', async () => {
-    render(<DashboardCharts {...defaultProps} />)
+    renderWithProviders(<DashboardCharts {...defaultProps} />)
     
     // This would test custom tooltip formatting
     // In a real implementation, you'd simulate hover events and check tooltip content
-    expect(screen.getByText('Utilización del Presupuesto')).toBeInTheDocument()
+    expect(screen.getByText('Utilización de Presupuesto')).toBeInTheDocument()
   })
 
   it('handles chart interactions correctly', async () => {
-    render(<DashboardCharts {...defaultProps} />)
+    renderWithProviders(<DashboardCharts {...defaultProps} />)
     
     // Test legend interactions (if implemented)
     const charts = screen.getAllByTestId('responsive-container')
@@ -136,7 +144,7 @@ describe('DashboardCharts', () => {
   })
 
   it('renders with correct accessibility attributes', () => {
-    render(<DashboardCharts {...defaultProps} />)
+    renderWithProviders(<DashboardCharts {...defaultProps} />)
     
     // Check for ARIA labels and roles
     const chartContainers = screen.getAllByRole('img', { hidden: true })
@@ -144,7 +152,7 @@ describe('DashboardCharts', () => {
   })
 
   it('updates when data changes', () => {
-    const { rerender } = render(<DashboardCharts {...defaultProps} />)
+    const { rerender } = renderWithProviders(<DashboardCharts {...defaultProps} />)
     
     const updatedProps = {
       ...defaultProps,
@@ -153,10 +161,14 @@ describe('DashboardCharts', () => {
       ]
     }
     
-    rerender(<DashboardCharts {...updatedProps} />)
+    rerender(
+      <ThemeProvider>
+        <DashboardCharts {...updatedProps} />
+      </ThemeProvider>
+    )
     
     // Verify that component re-renders with new data
-    expect(screen.getByText('Utilización del Presupuesto')).toBeInTheDocument()
+    expect(screen.getByText('Utilización de Presupuesto')).toBeInTheDocument()
   })
 
   it('maintains performance with large datasets', () => {
@@ -170,7 +182,7 @@ describe('DashboardCharts', () => {
     }
     
     const startTime = performance.now()
-    render(<DashboardCharts {...largeProps} />)
+    renderWithProviders(<DashboardCharts {...largeProps} />)
     const endTime = performance.now()
     
     // Should render within reasonable time (adjust threshold as needed)

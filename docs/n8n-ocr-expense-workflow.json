@@ -1,0 +1,337 @@
+{
+  "name": "OCR Expense Auto-Create Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "mailbox": "INBOX",
+        "options": {
+          "attachments": true,
+          "downloadAttachments": true
+        }
+      },
+      "name": "Email Trigger - Invoice Received",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "credentials": {
+        "imap": {
+          "id": "1",
+          "name": "Gmail IMAP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.subject}}",
+              "operation": "contains",
+              "value2": "Invoice"
+            }
+          ]
+        }
+      },
+      "name": "Filter - Only Invoices",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract attachment data\nconst attachments = $input.item.json.attachments || [];\nconst pdfAttachment = attachments.find(att => \n  att.mimeType === 'application/pdf' || \n  att.filename.endsWith('.pdf')\n);\n\nif (!pdfAttachment) {\n  throw new Error('No PDF attachment found');\n}\n\nreturn {\n  json: {\n    filename: pdfAttachment.filename,\n    mimeType: pdfAttachment.mimeType,\n    data: pdfAttachment.data,\n    emailSubject: $input.item.json.subject,\n    emailFrom: $input.item.json.from,\n    emailDate: $input.item.json.date\n  }\n};"
+      },
+      "name": "Extract PDF Attachment",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.ocr.space/parse/image",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "base64Image",
+              "value": "={{$json.data}}"
+            },
+            {
+              "name": "apikey",
+              "value": "={{$credentials.ocrSpaceApi.apiKey}}"
+            },
+            {
+              "name": "language",
+              "value": "eng"
+            },
+            {
+              "name": "isTable",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "OCR Processing - Extract Text",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 300],
+      "credentials": {
+        "ocrSpaceApi": {
+          "id": "2",
+          "name": "OCR.space API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Parse OCR results and extract invoice data\nconst ocrResult = $input.item.json;\nconst parsedText = ocrResult.ParsedResults?.[0]?.ParsedText || '';\n\n// Simple regex patterns for common invoice fields\nconst amountMatch = parsedText.match(/(?:Total|Amount|Sum)[:\\s]*\\$?([\\d,]+\\.\\d{2})/i);\nconst dateMatch = parsedText.match(/(\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})/i);\nconst invoiceMatch = parsedText.match(/(?:Invoice|INV)[#:\\s]*(\\w+[-\\w]*)/i);\n\n// Extract supplier from email sender or OCR text\nconst supplierMatch = parsedText.match(/(?:From|Vendor|Supplier)[:\\s]*([A-Za-z\\s&]+)/i);\nconst supplier = supplierMatch?.[1]?.trim() || $input.item.json.emailFrom;\n\n// Calculate confidence based on extracted fields\nlet confidence = 0;\nif (amountMatch) confidence += 0.3;\nif (dateMatch) confidence += 0.25;\nif (invoiceMatch) confidence += 0.2;\nif (supplier) confidence += 0.25;\n\n// Format date to ISO\nlet formattedDate = new Date().toISOString().split('T')[0];\nif (dateMatch) {\n  try {\n    const dateParts = dateMatch[1].split(/[\\/\\-]/);\n    formattedDate = `${dateParts[2]}-${dateParts[0].padStart(2, '0')}-${dateParts[1].padStart(2, '0')}`;\n  } catch (e) {\n    console.log('Date parsing failed, using current date');\n  }\n}\n\nreturn {\n  json: {\n    amount: amountMatch ? parseFloat(amountMatch[1].replace(',', '')) : 0,\n    date: formattedDate,\n    supplier: supplier,\n    description: `Invoice from ${supplier} - ${$input.item.json.emailSubject}`,\n    invoiceNumber: invoiceMatch?.[1] || '',\n    ocrData: {\n      confidence: confidence,\n      rawText: parsedText,\n      extractedFields: {\n        amount: { value: amountMatch?.[1], confidence: amountMatch ? 0.9 : 0 },\n        date: { value: dateMatch?.[1], confidence: dateMatch ? 0.85 : 0 },\n        invoice: { value: invoiceMatch?.[1], confidence: invoiceMatch ? 0.8 : 0 }\n      },\n      processingTime: ocrResult.ProcessingTimeInMilliseconds\n    },\n    file: {\n      name: $input.item.json.filename,\n      mimeType: $input.item.json.mimeType,\n      data: $input.item.json.data\n    },\n    source: 'email',\n    sourceId: $input.item.json.emailDate\n  }\n};"
+      },
+      "name": "Parse Invoice Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.ocrData.confidence}}",
+              "operation": "largerEqual",
+              "value2": 0.5
+            }
+          ]
+        }
+      },
+      "name": "Check Confidence",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://your-app.com/api/expenses/auto-create",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$credentials.apiKey}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "amount",
+              "value": "={{$json.amount}}"
+            },
+            {
+              "name": "date",
+              "value": "={{$json.date}}"
+            },
+            {
+              "name": "supplier",
+              "value": "={{$json.supplier}}"
+            },
+            {
+              "name": "description",
+              "value": "={{$json.description}}"
+            },
+            {
+              "name": "invoiceNumber",
+              "value": "={{$json.invoiceNumber}}"
+            },
+            {
+              "name": "ocrData",
+              "value": "={{$json.ocrData}}"
+            },
+            {
+              "name": "file",
+              "value": "={{$json.file}}"
+            },
+            {
+              "name": "source",
+              "value": "={{$json.source}}"
+            },
+            {
+              "name": "sourceId",
+              "value": "={{$json.sourceId}}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "name": "Create Expense - High Confidence",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1450, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "3",
+          "name": "API Key Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "chatId": "={{$credentials.telegramApi.chatId}}",
+        "text": "✅ Expense Created Successfully\\n\\nExpense ID: {{$json.expenseId}}\\nAmount: ${{$json.expense.amount}}\\nSupplier: {{$json.expense.supplier}}\\nStatus: {{$json.expense.status}}\\n\\nConfidence: {{Math.round($json.expense.ocrConfidence * 100)}}%"
+      },
+      "name": "Notify Success",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1650, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "4",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "chatId": "={{$credentials.telegramApi.chatId}}",
+        "text": "⚠️ Low Confidence Invoice - Manual Review Required\\n\\nSupplier: {{$json.supplier}}\\nAmount: ${{$json.amount}}\\nDate: {{$json.date}}\\nConfidence: {{Math.round($json.ocrData.confidence * 100)}}%\\n\\nPlease review and create expense manually."
+      },
+      "name": "Notify Low Confidence",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1450, 400],
+      "credentials": {
+        "telegramApi": {
+          "id": "4",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "chatId": "={{$credentials.telegramApi.chatId}}",
+        "text": "❌ Error Creating Expense\\n\\nError: {{$json.error}}\\nCode: {{$json.code}}\\n\\nPlease check the logs for details."
+      },
+      "name": "Notify Error",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1650, 300],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Email Trigger - Invoice Received": {
+      "main": [
+        [
+          {
+            "node": "Filter - Only Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter - Only Invoices": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Attachment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Attachment": {
+      "main": [
+        [
+          {
+            "node": "OCR Processing - Extract Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR Processing - Extract Text": {
+      "main": [
+        [
+          {
+            "node": "Parse Invoice Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Invoice Data": {
+      "main": [
+        [
+          {
+            "node": "Check Confidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Confidence": {
+      "main": [
+        [
+          {
+            "node": "Create Expense - High Confidence",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Low Confidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Expense - High Confidence": {
+      "main": [
+        [
+          {
+            "node": "Notify Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-01-15T10:00:00.000Z",
+  "versionId": "1"
+}

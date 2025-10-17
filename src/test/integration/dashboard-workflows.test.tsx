@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@/test/utils'
 import userEvent from '@testing-library/user-event'
 import { EnhancedDashboard } from '@/pages/EnhancedDashboard'
 import { createMockDashboardData, createMockWidget } from '@/test/utils'
@@ -38,8 +38,11 @@ vi.mock('@/hooks/useNotifications', () => ({
 }))
 
 vi.mock('@/hooks/useDashboardSettings', () => ({
-  useDashboardSettings: () => ({
-    widgets: [],
+  useDashboardSettings: vi.fn(() => ({
+    widgets: [
+      { id: 'stats', name: 'Estadísticas', description: 'Estadísticas generales', enabled: true, position: 1 },
+      { id: 'charts', name: 'Gráficos', description: 'Gráficos interactivos', enabled: true, position: 2 }
+    ],
     preferences: {
       defaultTimeFilter: 'month',
       autoRefresh: true,
@@ -53,8 +56,13 @@ vi.mock('@/hooks/useDashboardSettings', () => ({
     updateWidget: vi.fn(),
     updatePreferences: vi.fn(),
     updateLayout: vi.fn(),
-    resetSettings: vi.fn()
-  })
+    resetSettings: vi.fn(),
+    isModalOpen: false,
+    openModal: vi.fn(),
+    closeModal: vi.fn(),
+    exportSettings: vi.fn(() => '{}'),
+    importSettings: vi.fn()
+  }))
 }))
 
 describe('Dashboard Integration Workflows', () => {

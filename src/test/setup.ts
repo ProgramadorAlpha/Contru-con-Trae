@@ -57,6 +57,9 @@ expect.extend({
 // Cleanup after each test case
 afterEach(() => {
   cleanup()
+  // Reset document state
+  document.documentElement.className = ''
+  document.documentElement.style.colorScheme = ''
 })
 
 // Mock IntersectionObserver
@@ -64,6 +67,9 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
   observe: vi.fn(),
   unobserve: vi.fn(),
+  root: null,
+  rootMargin: '',
+  thresholds: [],
 }))
 
 // Mock ResizeObserver

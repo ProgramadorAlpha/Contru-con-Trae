@@ -51,6 +51,16 @@ export interface Project {
   status: string
   deadline: string
   budget: number
+  
+  // Financial Fields (Job Costing)
+  totalBudget?: number // Total project budget
+  committedCost?: number // Total committed through subcontracts
+  actualCost?: number // Total actual costs (expenses + payments)
+  marginPercentage?: number // Current profit margin percentage
+  financialHealth?: 'excellent' | 'good' | 'warning' | 'critical' // Financial status indicator
+  
+  // Cost Code Budgets
+  costCodeBudgets?: string[] // Array of cost code budget IDs
 }
 
 export interface Deadline {

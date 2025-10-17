@@ -462,5 +462,19 @@ export const DEFAULT_COST_CODES: Omit<CostCode, 'id' | 'createdAt' | 'updatedAt'
     unit: 'global',
     isActive: true,
     isDefault: false
+  },
+  
+  // 08 - Otros (Default for unclassified)
+  {
+    code: '08.01.01',
+    name: 'Gastos Generales',
+    description: 'Gastos generales no clasificados',
+    division: '08 - Otros',
+    category: '08.01 - Gastos Generales',
+    subcategory: '08.01.01 - Gastos Generales',
+    type: 'other',
+    unit: 'global',
+    isActive: true,
+    isDefault: true // This is the default cost code for auto-classification
   }
 ]

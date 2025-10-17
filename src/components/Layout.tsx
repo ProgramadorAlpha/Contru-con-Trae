@@ -1,12 +1,8 @@
-import React from 'react'
+import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { useDarkMode } from '@/hooks/useDarkMode'
 import { cn } from '@/lib/utils'
-
-interface LayoutProps {
-  children: React.ReactNode
-}
 
 /**
  * Main layout component that wraps the entire application
@@ -17,8 +13,9 @@ interface LayoutProps {
  * - Theme-aware background colors
  * - Smooth color transitions (200ms)
  * - Proper overflow handling
+ * - Uses Outlet for nested routes
  */
-export function Layout({ children }: LayoutProps) {
+export function Layout() {
   const { isDarkMode } = useDarkMode()
 
   return (
@@ -44,7 +41,7 @@ export function Layout({ children }: LayoutProps) {
           )}
         >
           <div className="container mx-auto px-6 py-8">
-            {children}
+            <Outlet />
           </div>
         </main>
       </div>

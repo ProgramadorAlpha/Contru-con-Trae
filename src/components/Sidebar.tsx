@@ -28,6 +28,10 @@ const menuItems = [
   { name: 'Equipo de Trabajo', href: '/team', icon: Users },
 ]
 
+const userItems = [
+  { name: 'Mi Perfil', href: '/profile', icon: Users },
+]
+
 const jobCostingItems = [
   { name: 'Subcontratos', href: '/subcontracts', icon: FileCheck },
   { name: 'Certificados', href: '/certificates', icon: CheckSquare },
@@ -59,9 +63,9 @@ export function Sidebar() {
           : 'bg-white'
       )}
     >
-      {/* Logo Section */}
+      {/* Logo Section - Clickeable */}
       <div className="p-6">
-        <div className="flex items-center space-x-3">
+        <Link to="/dashboard-enhanced" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
           <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
             <Building2 className="w-6 h-6 text-white" />
           </div>
@@ -79,7 +83,7 @@ export function Sidebar() {
               Gestión de Obras
             </p>
           </div>
-        </div>
+        </Link>
       </div>
       
       {/* Navigation */}
@@ -123,6 +127,37 @@ export function Sidebar() {
             </h3>
           </div>
           {jobCostingItems.map((item) => {
+            const Icon = item.icon
+            const isActive = location.pathname === item.href
+            
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={cn(
+                  'flex items-center px-6 py-3 text-sm font-medium',
+                  'transition-all duration-200',
+                  'focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500',
+                  isActive 
+                    ? isDarkMode
+                      ? 'bg-gray-700 text-blue-400 border-r-2 border-blue-400'
+                      : 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
+                    : isDarkMode
+                      ? 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                )}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                <Icon className="w-5 h-5 mr-3" />
+                {item.name}
+              </Link>
+            )
+          })}
+        </div>
+
+        {/* User Section */}
+        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+          {userItems.map((item) => {
             const Icon = item.icon
             const isActive = location.pathname === item.href
             

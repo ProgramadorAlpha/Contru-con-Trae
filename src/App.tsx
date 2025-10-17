@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { Layout } from '@/components/Layout'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
+import { LoginPage } from '@/pages/LoginPage'
+import { UserProfilePage } from '@/pages/UserProfilePage'
 import { EnhancedDashboard } from '@/pages/EnhancedDashboard'
 import { ProjectsPage } from '@/pages/ProjectsPage'
 import { BudgetPage } from '@/pages/budget/BudgetPage'
@@ -19,15 +22,16 @@ export default function App() {
   return (
     <ThemeProvider defaultTheme="system">
       <BrowserRouter>
-        <Layout>
-          <Routes>
-            {/* Redirect root to Enhanced Dashboard */}
+        <Routes>
+          {/* Public routes */}
+          <Route path="/login" element={<LoginPage />} />
+          
+          {/* Protected routes with Layout */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<Layout />}>
             <Route path="/" element={<Navigate to="/dashboard-enhanced" replace />} />
-            
-            {/* Enhanced Dashboard - Main dashboard */}
             <Route path="/dashboard-enhanced" element={<EnhancedDashboard />} />
-            
-            {/* Other routes */}
+            <Route path="/profile" element={<UserProfilePage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/budget" element={<BudgetPage />} />
             <Route path="/reports" element={<ReportsPage />} />
@@ -40,10 +44,11 @@ export default function App() {
             <Route path="/certificates" element={<ProgressCertificatesPage />} />
             <Route path="/cost-codes" element={<CostCodesPage />} />
             <Route path="/expense-approvals" element={<ExpenseApprovalsPage />} />
-            <Route path="/project-financials/:projectId" element={<ProjectFinancialsPage />} />
-            <Route path="/audit-log" element={<AuditLogPage />} />
-          </Routes>
-        </Layout>
+              <Route path="/project-financials/:projectId" element={<ProjectFinancialsPage />} />
+              <Route path="/audit-log" element={<AuditLogPage />} />
+            </Route>
+          </Route>
+        </Routes>
       </BrowserRouter>
     </ThemeProvider>
   )

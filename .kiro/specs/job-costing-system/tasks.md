@@ -314,8 +314,13 @@
 
 ## Phase 10: Deployment & Migration 🔴 NOT STARTED
 
-- [ ] 30. Data Migration
-  - [ ] 30.1 Create migration scripts for existing projects and expenses, and initialize cost code catalog
+- [x] 30. Data Migration
+
+
+
+  - [x] 30.1 Create migration scripts for existing projects and expenses, and initialize cost code catalog
+
+
     - _Requirements: 3.1, 9.5_
 
 - [x] 31. Production Deployment

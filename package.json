@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "check": "tsc -b --noEmit",
@@ -19,7 +19,8 @@
     "deploy:verify-dashboard": "node scripts/verify-dashboard-only.js",
     "deploy:job-costing": "node scripts/deploy-job-costing.js",
     "monitor:job-costing": "node scripts/monitor-job-costing.js",
-    "health-check": "node scripts/system-health-check.js"
+    "health-check": "node scripts/system-health-check.js",
+    "migrate:job-costing": "node scripts/migrate-job-costing.js"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.0",

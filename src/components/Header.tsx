@@ -1,24 +1,40 @@
-import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Search, User, Settings, LogOut } from 'lucide-react'
 import { NotificationCenter } from './NotificationCenter'
 import { DarkModeToggle } from './DarkModeToggle'
 import { useDarkMode } from '@/hooks/useDarkMode'
+import { useAuth } from '@/contexts/AuthContext'
 import { cn } from '@/lib/utils'
 
 /**
- * Header component with theme support
+ * Header component with theme support and authentication
  * 
  * Features:
  * - Search bar with theme-aware styling
- * - Dark mode toggle (compact variant)
- * - Notification center
- * - User profile section
- * - Settings and logout buttons
+ * - Dark mode toggle (compact variant - SINGLE INSTANCE)
+ * - Notification center (SINGLE INSTANCE)
+ * - User profile section with current user data
+ * - Settings and logout buttons (functional)
  * - Responsive design for mobile
  * - Smooth color transitions
  */
 export function Header() {
   const { isDarkMode } = useDarkMode()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      navigate('/login')
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
+
+  const handleProfileClick = () => {
+    navigate('/profile')
+  }
 
   return (
     <header 
@@ -62,25 +78,32 @@ export function Header() {
           <NotificationCenter />
           
           {/* User Profile - Hidden on small screens */}
-          <div className="hidden md:flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-              <User className="w-4 h-4 text-white" />
+          <button
+            onClick={handleProfileClick}
+            className="hidden md:flex items-center space-x-3 hover:opacity-80 transition-opacity"
+          >
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center">
+              {user?.photoURL ? (
+                <img src={user.photoURL} alt={user.displayName} className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-4 h-4 text-white" />
+              )}
             </div>
-            <div className="text-sm">
+            <div className="text-sm text-left">
               <p className={cn(
                 'font-medium transition-colors duration-200',
                 isDarkMode ? 'text-white' : 'text-gray-900'
               )}>
-                Administrador
+                {user?.displayName || 'Usuario'}
               </p>
               <p className={cn(
                 'transition-colors duration-200',
                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
               )}>
-                admin@constructpro.com
+                {user?.email || ''}
               </p>
             </div>
-          </div>
+          </button>
           
           {/* Settings Button */}
           <button 
@@ -99,6 +122,7 @@ export function Header() {
           
           {/* Logout Button */}
           <button 
+            onClick={handleLogout}
             className={cn(
               'p-2 rounded-lg transition-all duration-200',
               'hover:scale-110 active:scale-95',
@@ -108,6 +132,7 @@ export function Header() {
                 : 'text-gray-400 hover:text-red-600 hover:bg-gray-100'
             )}
             aria-label="Cerrar sesión"
+            title="Cerrar sesión"
           >
             <LogOut className="w-5 h-5" />
           </button>

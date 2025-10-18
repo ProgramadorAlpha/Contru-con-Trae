@@ -12,6 +12,7 @@ import { DashboardSettingsLazy } from '@/components/dashboard/DashboardSettingsL
 import { ChartErrorBoundary } from '@/components/dashboard/ChartErrorBoundary'
 import { ProfitabilityWidget } from '@/components/financials/ProfitabilityWidget'
 import { CommittedCostWidget } from '@/components/financials/CommittedCostWidget'
+import { QuickActions } from '@/components/dashboard/QuickActions'
 import { 
   StatsCardSkeleton, 
   ChartSkeleton, 
@@ -35,7 +36,7 @@ export function EnhancedDashboard() {
 
   // Hooks personalizados
   const { data, loading, error, exportData } = useDashboardData(timeFilter, dateRange, {
-    autoRefresh: true,
+    autoRefresh: false, // Disabled to prevent automatic page refreshes
     refreshInterval: 30000
   })
 
@@ -196,11 +197,8 @@ export function EnhancedDashboard() {
         )
       
       case 'quick-actions':
-        return (
-          <div className="mb-8">
-            <QuickActions />
-          </div>
-        )
+        // Quick actions are now always visible at the top, skip rendering here
+        return null
       
       case 'team-performance':
         if (!data) return null
@@ -316,6 +314,14 @@ export function EnhancedDashboard() {
             </button>
           </div>
         </div>
+
+        {/* Acciones Rápidas - Siempre visible en la parte superior */}
+        <QuickActions 
+          onActionComplete={(action) => {
+            console.log('Quick action completed:', action)
+            // Future: Refresh dashboard data based on action
+          }}
+        />
 
         {/* Filtros y controles */}
         <DashboardFilters
@@ -505,31 +511,7 @@ function UpcomingDeadlines({ deadlines, loading = false }: { deadlines: any[], l
   )
 }
 
-function QuickActions() {
-  return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: 'Nuevo Proyecto', color: 'bg-blue-600 hover:bg-blue-700' },
-          { label: 'Agregar Tarea', color: 'bg-green-600 hover:bg-green-700' },
-          { label: 'Ver Reportes', color: 'bg-purple-600 hover:bg-purple-700' },
-          { label: 'Gestionar Equipo', color: 'bg-orange-600 hover:bg-orange-700' }
-        ].map((action, index) => (
-          <button
-            key={index}
-            className={cn(
-              'p-3 text-white text-sm font-medium rounded-lg transition-colors',
-              action.color
-            )}
-          >
-            {action.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
+
 
 function TeamPerformanceWidget({ data, stats }: { data: any[], stats: any }) {
   const latestPerformance = data[data.length - 1]

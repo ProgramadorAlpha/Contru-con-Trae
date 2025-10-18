@@ -379,6 +379,84 @@ class ExpenseService {
   }
 
   /**
+   * Create expense quickly from dashboard quick actions
+   * Simplified validation for rapid expense entry while maintaining
+   * mandatory classification requirements (project, costCode, supplier)
+   */
+  async createExpenseQuick(data: CreateExpenseDTO): Promise<Expense> {
+    await this.delay()
+
+    // Validate required classification (same as regular create)
+    const validation = this.validateExpenseClassification(data)
+    if (!validation.isValid) {
+      throw new Error(`Validation failed: ${validation.errors.map(e => e.message).join(', ')}`)
+    }
+
+    // Get cost code details
+    const costCode = await costCodeService.getCostCode(data.costCodeId)
+    if (!costCode) {
+      throw new Error('Invalid cost code')
+    }
+
+    const newExpense: Expense = {
+      id: this.generateId(),
+      expenseNumber: `QE-${Date.now()}`, // Quick Expense prefix
+      
+      // Classification (required)
+      projectId: data.projectId,
+      projectName: data.projectName,
+      costCodeId: data.costCodeId,
+      costCode,
+      supplierId: data.supplierId,
+      supplierName: data.supplierName,
+      
+      // Financial
+      amount: data.amount,
+      currency: data.currency || 'USD',
+      taxAmount: data.taxAmount,
+      totalAmount: data.amount + (data.taxAmount || 0),
+      
+      // Details
+      description: data.description,
+      invoiceNumber: data.invoiceNumber,
+      invoiceDate: data.invoiceDate,
+      dueDate: data.dueDate,
+      
+      // Status - Quick expenses start as draft
+      status: 'draft',
+      paymentStatus: 'unpaid',
+      
+      // Workflow
+      submittedBy: 'current-user-id', // TODO: Get from auth context
+      submittedAt: new Date().toISOString(),
+      
+      // Automation flags
+      isAutoCreated: false,
+      needsReview: false,
+      
+      // Documents
+      attachments: [],
+      
+      // Metadata
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      notes: data.notes,
+      tags: data.tags ? [...data.tags, 'quick-action'] : ['quick-action']
+    }
+
+    mockExpenses.push(newExpense)
+
+    // Update cost code budget with actual amount
+    await costCodeService.updateBudgetActuals(
+      data.projectId,
+      data.costCodeId,
+      newExpense.totalAmount
+    )
+
+    return newExpense
+  }
+
+  /**
    * Get expense by ID
    */
   async getExpense(id: string): Promise<Expense | null> {

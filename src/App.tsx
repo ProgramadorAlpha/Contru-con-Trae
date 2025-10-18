@@ -18,8 +18,14 @@ import { CostCodesPage } from '@/pages/CostCodesPage'
 import { ExpenseApprovalsPage } from '@/pages/ExpenseApprovalsPage'
 import { ProjectFinancialsPage } from '@/pages/ProjectFinancialsPage'
 import { AuditLogPage } from '@/pages/AuditLogPage'
+import { AIAssistantButton } from '@/components/ai/AIAssistantButton'
+import { AIAssistantModal } from '@/components/ai/AIAssistantModal'
+import { useAIAssistant } from '@/hooks/useAIAssistant'
+import '@/styles/ai-animations.css'
 
 export default function App() {
+  const aiAssistant = useAIAssistant()
+
   return (
     <ThemeProvider defaultTheme="system">
       <AuthProvider>
@@ -51,6 +57,17 @@ export default function App() {
             </Route>
           </Route>
         </Routes>
+
+        {/* AI Assistant - Available globally */}
+        <AIAssistantButton
+          notificationCount={aiAssistant.notificationCount}
+          onClick={() => aiAssistant.openAssistant()}
+        />
+        <AIAssistantModal
+          isOpen={aiAssistant.isOpen}
+          onClose={aiAssistant.closeAssistant}
+          initialView={aiAssistant.currentView}
+        />
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>

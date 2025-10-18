@@ -58,14 +58,14 @@ export function ProjectsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <main role="main" className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      </main>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <main role="main" className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Proyectos</h1>
         <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
@@ -206,6 +206,6 @@ export function ProjectsPage() {
           <p className="text-gray-500">Intenta ajustar tu búsqueda o crea un nuevo proyecto.</p>
         </div>
       )}
-    </div>
+    </main>
   )
 }

@@ -242,21 +242,21 @@ export function EnhancedDashboard() {
 
   if (loading) {
     return (
-      <div className="animate-fade-in">
+      <main role="main" className="animate-fade-in">
         <DashboardSkeleton />
-      </div>
+      </main>
     )
   }
 
   if (error) {
-    return <DashboardError error={error} onRetry={() => window.location.reload()} />
+    return <main role="main"><DashboardError error={error} onRetry={() => window.location.reload()} /></main>
   }
 
   if (!data) {
     return (
-      <div className="animate-fade-in">
+      <main role="main" className="animate-fade-in">
         <DashboardSkeleton />
-      </div>
+      </main>
     )
   }
 
@@ -265,6 +265,7 @@ export function EnhancedDashboard() {
     .sort((a, b) => a.position - b.position)
 
   return (
+    <main role="main">
     <ChartErrorBoundary 
       chartType="enhanced-dashboard"
       onError={(error, errorInfo) => {
@@ -273,7 +274,7 @@ export function EnhancedDashboard() {
         // In production, send to error monitoring service
       }}
     >
-      <div className="space-y-6">
+      <main role="main" className="space-y-6">
         {/* Header con notificaciones */}
         <div className="flex items-center justify-between sm:flex-row flex-col sm:items-center items-start sm:space-y-0 space-y-4">
           <div className="sm:text-left text-center sm:w-auto w-full">
@@ -373,8 +374,9 @@ export function EnhancedDashboard() {
           onSaveSettings={saveSettings}
           onResetToDefault={resetToDefault}
         />
-      </div>
+      </main>
     </ChartErrorBoundary>
+    </main>
   )
 }
 

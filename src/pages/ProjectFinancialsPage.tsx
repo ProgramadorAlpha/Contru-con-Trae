@@ -27,15 +27,15 @@ export function ProjectFinancialsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <main role="main" className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      </main>
     )
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+      <main role="main" className="bg-red-50 border border-red-200 rounded-lg p-6">
         <div className="flex items-center gap-3">
           <AlertCircle className="w-6 h-6 text-red-600" />
           <div>
@@ -43,20 +43,20 @@ export function ProjectFinancialsPage() {
             <p className="text-sm text-red-700 mt-1">{error.message}</p>
           </div>
         </div>
-      </div>
+      </main>
     )
   }
 
   if (!financials) {
     return (
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
+      <main role="main" className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
         <p className="text-gray-500">No se encontraron datos financieros para este proyecto</p>
-      </div>
+      </main>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <main role="main" className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -198,6 +198,6 @@ export function ProjectFinancialsPage() {
           onExport={handleExport}
         />
       )}
-    </div>
+    </main>
   )
 }

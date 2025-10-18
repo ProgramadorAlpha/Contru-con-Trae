@@ -174,14 +174,14 @@ export function UserProfilePage() {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <main role="main" className="flex items-center justify-center h-64">
         <p className="text-gray-500">Please log in to view your profile</p>
-      </div>
+      </main>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <main role="main" className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -460,6 +460,6 @@ export function UserProfilePage() {
           </form>
         </div>
       )}
-    </div>
+    </main>
   )
 }

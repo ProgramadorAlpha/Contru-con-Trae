@@ -76,7 +76,7 @@ export function AuditLogPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <main role="main" className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -360,7 +360,7 @@ export function AuditLogPage() {
           </div>
         </div>
       )}
-    </div>
+    </main>
   )
 }
 

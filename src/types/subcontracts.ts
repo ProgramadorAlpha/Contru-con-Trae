@@ -15,6 +15,7 @@ export interface SubcontractDocument {
   url: string
   uploadDate: string
   size: number
+  mimeType: string
 }
 
 /**
@@ -27,6 +28,8 @@ export interface PaymentScheduleItem {
   amount: number
   dueDate?: string
   status: 'pending' | 'certified' | 'paid'
+  certifiedDate?: string
+  paidDate?: string
 }
 
 /**
@@ -72,6 +75,11 @@ export interface Subcontract {
   totalRetained: number // Total amount retained
   remainingBalance: number // Amount left to certify
   
+  // Additional Info
+  notes?: string
+  terms?: string
+  warrantyPeriod?: number // in months
+  
   // Metadata
   createdBy: string
   createdAt: string
@@ -99,6 +107,9 @@ export interface CreateSubcontractDTO {
   startDate: string
   endDate: string
   costCodes: string[]
+  notes?: string
+  terms?: string
+  warrantyPeriod?: number
 }
 
 /**
@@ -117,4 +128,52 @@ export interface UpdateSubcontractDTO {
   completionDate?: string
   status?: 'draft' | 'active' | 'completed' | 'cancelled'
   costCodes?: string[]
+}
+
+/**
+ * Subcontract status type
+ */
+export type SubcontractStatus = 'draft' | 'active' | 'completed' | 'cancelled'
+
+/**
+ * Filters for querying subcontracts
+ */
+export interface SubcontractFilters {
+  projectId?: string
+  subcontractorId?: string
+  status?: SubcontractStatus
+  costCodeId?: string
+  dateFrom?: string
+  dateTo?: string
+  minAmount?: number
+  maxAmount?: number
+  search?: string
+}
+
+/**
+ * Response from subcontract queries with pagination
+ */
+export interface SubcontractResponse {
+  data: Subcontract[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+/**
+ * Summary statistics for subcontracts
+ */
+export interface SubcontractStats {
+  total: number
+  draft: number
+  active: number
+  completed: number
+  cancelled: number
+  totalAmount: number
+  totalPaid: number
+  totalPending: number
+  averageAmount: number
+  byProject: Record<string, number>
+  byCostCode: Record<string, number>
 }

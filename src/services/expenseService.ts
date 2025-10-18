@@ -412,24 +412,29 @@ class ExpenseService {
     }
 
     // Update cost code if changed
+    // Update cost code if changed
+    let updatedCostCode = mockExpenses[index].costCode
     if (data.costCodeId && data.costCodeId !== mockExpenses[index].costCodeId) {
       const costCode = await costCodeService.getCostCode(data.costCodeId)
       if (!costCode) {
         throw new Error('Invalid cost code')
       }
-      data.costCode = costCode
+      updatedCostCode = costCode
     }
 
     // Recalculate total if amount or tax changed
+    let updatedTotalAmount = mockExpenses[index].totalAmount
     if (data.amount !== undefined || data.taxAmount !== undefined) {
       const newAmount = data.amount ?? mockExpenses[index].amount
       const newTaxAmount = data.taxAmount ?? mockExpenses[index].taxAmount ?? 0
-      data.totalAmount = newAmount + newTaxAmount
+      updatedTotalAmount = newAmount + newTaxAmount
     }
 
     mockExpenses[index] = {
       ...mockExpenses[index],
       ...data,
+      costCode: updatedCostCode,
+      totalAmount: updatedTotalAmount,
       updatedAt: new Date().toISOString()
     }
 

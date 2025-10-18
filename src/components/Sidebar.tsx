@@ -19,7 +19,7 @@ import { useDarkMode } from '@/hooks/useDarkMode'
 import { cn } from '@/lib/utils'
 
 const menuItems = [
-  { name: 'Dashboard Mejorado', href: '/dashboard-enhanced', icon: BarChart3 },
+  { name: 'Dashboard', href: '/dashboard-enhanced', icon: BarChart3 },
   { name: 'Proyectos', href: '/projects', icon: Building2 },
   { name: 'Presupuesto', href: '/budget', icon: Calculator },
   { name: 'Reportes', href: '/reports', icon: BarChart3 },

@@ -15,14 +15,8 @@ interface Project {
   name: string
 }
 
-// Mock projects for development
-const MOCK_PROJECTS: Project[] = [
-  { id: 'proj-001', name: 'Construcción Edificio Central' },
-  { id: 'proj-002', name: 'Remodelación Casa Residencial' },
-  { id: 'proj-003', name: 'Ampliación Oficinas Corporativas' },
-  { id: 'proj-004', name: 'Construcción Centro Comercial' },
-  { id: 'proj-005', name: 'Renovación Hotel Boutique' }
-]
+// Projects will be loaded from API
+// Using the same projects as in the Projects module for consistency
 
 const PAYMENT_METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'bank_transfer', label: 'Transferencia Bancaria' },
@@ -74,6 +68,8 @@ export function AddIncomeModal({
   const [errors, setErrors] = useState<FormErrors>({})
   const [searchTerm, setSearchTerm] = useState('')
   const [showProjectDropdown, setShowProjectDropdown] = useState(false)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loadingProjects, setLoadingProjects] = useState(true)
   
   const [formData, setFormData] = useState<FormData>({
     projectId: '',
@@ -84,6 +80,24 @@ export function AddIncomeModal({
     reference: '',
     invoiceNumber: ''
   })
+
+  // Load projects from API
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        setLoadingProjects(true)
+        const { projectAPI } = await import('@/lib/api')
+        const data = await projectAPI.getAll()
+        setProjects(data.map(p => ({ id: p.id, name: p.name })))
+      } catch (error) {
+        console.error('Error loading projects:', error)
+      } finally {
+        setLoadingProjects(false)
+      }
+    }
+
+    loadProjects()
+  }, [])
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -120,11 +134,11 @@ export function AddIncomeModal({
   }, [isOpen, showProjectDropdown, onClose])
 
   // Filter projects based on search
-  const filteredProjects = MOCK_PROJECTS.filter(project =>
+  const filteredProjects = projects.filter(project =>
     project.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const selectedProject = MOCK_PROJECTS.find(p => p.id === formData.projectId)
+  const selectedProject = projects.find(p => p.id === formData.projectId)
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
@@ -291,7 +305,8 @@ export function AddIncomeModal({
                   }
                 }}
                 onFocus={() => setShowProjectDropdown(true)}
-                placeholder="Buscar proyecto..."
+                placeholder={loadingProjects ? "Cargando proyectos..." : "Buscar proyecto..."}
+                disabled={loadingProjects}
                 className={cn(
                   'w-full pl-10 pr-3 py-2 rounded-lg border transition-colors duration-200',
                   'focus:outline-none focus:ring-2 focus:ring-blue-500',
@@ -299,7 +314,8 @@ export function AddIncomeModal({
                     ? 'border-red-500'
                     : isDarkMode
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400',
+                  loadingProjects && 'opacity-50 cursor-not-allowed'
                 )}
                 aria-required="true"
                 aria-invalid={!!errors.projectId}

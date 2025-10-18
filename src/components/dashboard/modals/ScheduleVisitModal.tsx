@@ -15,14 +15,8 @@ interface Project {
   name: string
 }
 
-// Mock projects for development
-const MOCK_PROJECTS: Project[] = [
-  { id: 'proj-001', name: 'Construcción Edificio Central' },
-  { id: 'proj-002', name: 'Remodelación Casa Residencial' },
-  { id: 'proj-003', name: 'Ampliación Oficinas Corporativas' },
-  { id: 'proj-004', name: 'Construcción Centro Comercial' },
-  { id: 'proj-005', name: 'Renovación Hotel Boutique' }
-]
+// Projects will be loaded from API
+// Using the same projects as in the Projects module for consistency
 
 const VISIT_TYPES = [
   { value: 'inspection', label: 'Inspección' },
@@ -74,6 +68,8 @@ export function ScheduleVisitModal({
   const [errors, setErrors] = useState<FormErrors>({})
   const [searchTerm, setSearchTerm] = useState('')
   const [showProjectDropdown, setShowProjectDropdown] = useState(false)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loadingProjects, setLoadingProjects] = useState(true)
   
   // Get tomorrow's date as minimum date
   const tomorrow = new Date()
@@ -87,6 +83,24 @@ export function ScheduleVisitModal({
     type: '',
     notes: ''
   })
+
+  // Load projects from API
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        setLoadingProjects(true)
+        const { projectAPI } = await import('@/lib/api')
+        const data = await projectAPI.getAll()
+        setProjects(data.map(p => ({ id: p.id, name: p.name })))
+      } catch (error) {
+        console.error('Error loading projects:', error)
+      } finally {
+        setLoadingProjects(false)
+      }
+    }
+
+    loadProjects()
+  }, [])
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -125,11 +139,11 @@ export function ScheduleVisitModal({
   }, [isOpen, showProjectDropdown, onClose])
 
   // Filter projects based on search
-  const filteredProjects = MOCK_PROJECTS.filter(project =>
+  const filteredProjects = projects.filter(project =>
     project.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const selectedProject = MOCK_PROJECTS.find(p => p.id === formData.projectId)
+  const selectedProject = projects.find(p => p.id === formData.projectId)
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}

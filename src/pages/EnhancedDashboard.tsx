@@ -1,10 +1,9 @@
 import React, { useState, useCallback } from 'react'
-import { Bell, AlertCircle, TrendingUp, Users, Calendar, Wrench, DollarSign } from 'lucide-react'
+import { AlertCircle, TrendingUp, Users, Calendar, Wrench, DollarSign } from 'lucide-react'
 import { useDarkMode } from '@/hooks/useDarkMode'
 import { useDashboardData } from '@/hooks/useDashboardData'
 import { useNotifications } from '@/hooks/useNotifications'
 import { useDashboardSettings } from '@/hooks/useDashboardSettings'
-import { DarkModeToggleCompact } from '@/components/DarkModeToggle'
 import { DashboardFilters } from '@/components/dashboard/DashboardFilters'
 import { DashboardCharts } from '@/components/dashboard/DashboardCharts'
 import { NotificationCenter } from '@/components/dashboard/NotificationCenter'
@@ -273,14 +272,14 @@ export function EnhancedDashboard() {
       }}
     >
       <main role="main" className="space-y-6">
-        {/* Header con notificaciones */}
+        {/* Header */}
         <div className="flex items-center justify-between sm:flex-row flex-col sm:items-center items-start sm:space-y-0 space-y-4">
           <div className="sm:text-left text-center sm:w-auto w-full">
             <h1 className={cn(
               "text-3xl font-bold sm:text-3xl text-2xl",
               isDarkMode ? "text-white" : "text-gray-900"
             )}>
-              Dashboard Mejorado
+              Dashboard
             </h1>
             <p className={cn(
               "mt-1 sm:text-base text-sm",
@@ -290,29 +289,11 @@ export function EnhancedDashboard() {
             </p>
           </div>
           
-          <div className="flex items-center space-x-3 sm:w-auto w-full sm:justify-end justify-center">
-            {/* Botón de modo oscuro */}
-            <DarkModeToggleCompact />
-            
-            {/* Botón de notificaciones */}
-            <button
-              onClick={() => setNotificationsOpen(true)}
-              className={cn(
-                "relative p-2 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center",
-                isDarkMode
-                  ? "text-gray-300 hover:text-white hover:bg-gray-800"
-                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
-              )}
-              aria-label={`Notificaciones${unreadCount > 0 ? ` (${unreadCount} sin leer)` : ''}`}
-            >
-              <Bell className="w-6 h-6" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </button>
-          </div>
+          {/* 
+            Nota: Los botones de modo oscuro y notificaciones están disponibles 
+            en el header principal de la aplicación. No se duplican aquí para 
+            mantener una interfaz limpia y evitar confusión.
+          */}
         </div>
 
         {/* Acciones Rápidas - Siempre visible en la parte superior */}

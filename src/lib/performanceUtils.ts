@@ -182,7 +182,7 @@ export class PerformanceMonitor {
       }
       
       // Log slow operations in development
-      if (process.env.NODE_ENV === 'development' && duration > 100) {
+      if (import.meta.env.MODE === 'development' && duration > 100) {
         console.warn(`Slow operation detected: ${label} took ${duration.toFixed(2)}ms`)
       }
     }
@@ -245,7 +245,7 @@ export function createStableCallback<T extends (...args: any[]) => any>(
 
 // Memory usage monitoring (for development)
 export function logMemoryUsage(label: string) {
-  if (process.env.NODE_ENV === 'development' && 'memory' in performance) {
+  if (import.meta.env.MODE === 'development' && 'memory' in performance) {
     const memory = (performance as any).memory
     console.log(`Memory usage (${label}):`, {
       used: `${Math.round(memory.usedJSHeapSize / 1024 / 1024)} MB`,

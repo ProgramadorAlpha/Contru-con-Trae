@@ -127,7 +127,7 @@ export class ChartErrorBoundary extends Component<Props, State> {
             </p>
             
             {/* Error details for development */}
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.MODE === 'development' && this.state.error && (
               <details className="mb-4 text-left">
                 <summary className="cursor-pointer text-sm text-red-600 hover:text-red-800">
                   Ver detalles del error

@@ -72,6 +72,7 @@ class GastoService {
 
   /**
    * Create a new gasto
+   * Task 16.3: Execute financial verifications after registering expense
    */
   async createGasto(data: CreateGastoDTO): Promise<Gasto> {
     try {
@@ -99,6 +100,16 @@ class GastoService {
       this.saveGastos(gastos);
 
       console.log('✅ Gasto created with projectId:', data.proyecto_id, newGasto);
+
+      // Task 16.3: Execute financial verifications after registering expense
+      // Requirements: 8.1, 8.2, 8.3, 8.4
+      try {
+        const { ejecutarVerificacionesAlRegistrarGasto } = await import('../utils/financial-verifications.utils');
+        await ejecutarVerificacionesAlRegistrarGasto(data.proyecto_id, data.monto);
+      } catch (error) {
+        console.error('Error executing financial verifications:', error);
+        // Don't fail the expense registration if verifications fail
+      }
 
       return newGasto;
     } catch (error) {

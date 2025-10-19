@@ -1,0 +1,142 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function belongsToUserCompany() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.empresaId == resource.data.empresaId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+    
+    // Clientes collection
+    match /clientes/{clienteId} {
+      allow read: if isAuthenticated() && belongsToUserCompany();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && belongsToUserCompany();
+    }
+    
+    // Presupuestos collection
+    match /presupuestos/{presupuestoId} {
+      // Authenticated users can read presupuestos from their company
+      allow read: if isAuthenticated() && belongsToUserCompany();
+      
+      // Authenticated users can create presupuestos
+      allow create: if isAuthenticated();
+      
+      // Only users from the same company can update/delete
+      allow update, delete: if isAuthenticated() && belongsToUserCompany();
+      
+      // Historial subcollection
+      match /historial/{cambioId} {
+        allow read: if isAuthenticated() && belongsToUserCompany();
+        allow write: if isAuthenticated() && belongsToUserCompany();
+      }
+    }
+
+    
+    // Public presupuestos access (for client viewing)
+    match /presupuestos-publicos/{token} {
+      // Anyone with the token can read
+      allow read: if true;
+      
+      // Only authenticated users can create/update
+      allow write: if isAuthenticated();
+    }
+    
+    // Proyectos collection (extended for finance module)
+    match /proyectos/{proyectoId} {
+      allow read: if isAuthenticated() && belongsToUserCompany();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && belongsToUserCompany();
+      
+      // Fases subcollection
+      match /fases/{faseId} {
+        allow read: if isAuthenticated() && belongsToUserCompany();
+        allow write: if isAuthenticated() && belongsToUserCompany();
+      }
+      
+      // Gastos subcollection
+      match /gastos/{gastoId} {
+        allow read: if isAuthenticated() && belongsToUserCompany();
+        allow write: if isAuthenticated() && belongsToUserCompany();
+      }
+    }
+    
+    // Facturas collection
+    match /facturas/{facturaId} {
+      allow read: if isAuthenticated() && belongsToUserCompany();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && belongsToUserCompany();
+      // Only admins can delete facturas
+      allow delete: if isAdmin();
+    }
+    
+    // Alertas Financieras collection
+    match /alertas-financieras/{alertaId} {
+      allow read: if isAuthenticated() && belongsToUserCompany();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && belongsToUserCompany();
+      // Alertas can be deleted by admins or auto-resolved by system
+      allow delete: if isAdmin();
+    }
+    
+    // Gastos collection (global, not project-specific)
+    match /gastos/{gastoId} {
+      allow read: if isAuthenticated() && belongsToUserCompany();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && belongsToUserCompany();
+    }
+    
+    // Documentos collection (for document-expense linking)
+    match /documentos/{documentoId} {
+      allow read: if isAuthenticated() && belongsToUserCompany();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && belongsToUserCompany();
+    }
+    
+    // Tesoreria collection (cached calculations)
+    match /tesoreria/{proyectoId} {
+      allow read: if isAuthenticated() && belongsToUserCompany();
+      // Only system/backend can write tesoreria calculations
+      allow write: if isAuthenticated() && belongsToUserCompany();
+    }
+    
+    // Rentabilidad collection (analysis results)
+    match /rentabilidad/{proyectoId} {
+      allow read: if isAuthenticated() && belongsToUserCompany();
+      allow write: if isAuthenticated() && belongsToUserCompany();
+    }
+    
+    // Notificaciones collection
+    match /notificaciones/{notificacionId} {
+      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && isOwner(resource.data.userId);
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

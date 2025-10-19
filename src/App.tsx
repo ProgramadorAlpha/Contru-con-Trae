@@ -21,6 +21,15 @@ import { ProjectIncomePage } from '@/pages/ProjectIncomePage'
 import { ProjectDetailPage } from '@/pages/ProjectDetailPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { AuditLogPage } from '@/pages/AuditLogPage'
+import { PresupuestosPage } from '@/pages/PresupuestosPage'
+import { PresupuestoCreatorPage } from '@/pages/PresupuestoCreatorPage'
+import { PresupuestoViewPage } from '@/pages/PresupuestoViewPage'
+import { ClientesPage } from '@/pages/ClientesPage'
+import { FinanzasPage } from '@/pages/FinanzasPage'
+import { GastosPage } from '@/pages/finanzas/GastosPage'
+import { FacturacionPage } from '@/pages/finanzas/FacturacionPage'
+import { ReportesFinancierosPage } from '@/pages/finanzas/ReportesFinancierosPage'
+import { PresupuestoPublicPage } from '@/pages/public/PresupuestoPublicPage'
 import { AIAssistantButton } from '@/components/ai/AIAssistantButton'
 import { AIAssistantModal } from '@/components/ai/AIAssistantModal'
 import { useAIAssistant } from '@/hooks/useAIAssistant'
@@ -36,6 +45,7 @@ export default function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/presupuestos/public/:token" element={<PresupuestoPublicPage />} />
           
           {/* Protected routes with Layout */}
           <Route element={<ProtectedRoute />}>
@@ -49,6 +59,16 @@ export default function App() {
             <Route path="/documents" element={<DocumentsPage />} />
             <Route path="/tools" element={<ToolsPage />} />
             <Route path="/team" element={<TeamPage />} />
+            
+            {/* Budget & Finance Module routes */}
+            <Route path="/presupuestos" element={<PresupuestosPage />} />
+            <Route path="/presupuestos/crear" element={<PresupuestoCreatorPage />} />
+            <Route path="/presupuestos/:id" element={<PresupuestoViewPage />} />
+            <Route path="/clientes" element={<ClientesPage />} />
+            <Route path="/finanzas" element={<FinanzasPage />} />
+            <Route path="/gastos" element={<GastosPage />} />
+            <Route path="/facturas" element={<FacturacionPage />} />
+            <Route path="/reportes" element={<ReportesFinancierosPage />} />
             
             {/* Job Costing System routes */}
             <Route path="/subcontracts" element={<SubcontractsPage />} />

@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react'
-import { AlertCircle, TrendingUp, Users, Calendar, Wrench, DollarSign } from 'lucide-react'
+import { AlertCircle, TrendingUp, Users, Calendar, Wrench, DollarSign, FileSpreadsheet, Wallet, Plus, Eye } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useDarkMode } from '@/hooks/useDarkMode'
 import { useDashboardData } from '@/hooks/useDashboardData'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -24,6 +25,7 @@ import { formatCurrency } from '@/lib/chartUtils'
 export function EnhancedDashboard() {
   // Hook de modo oscuro (activado por defecto)
   const { isDarkMode } = useDarkMode()
+  const navigate = useNavigate()
   
   // Estados para filtros temporales
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('month')
@@ -208,27 +210,35 @@ export function EnhancedDashboard() {
         )
       
       case 'job-costing':
-        return (
-          <div className="mb-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ProfitabilityWidget
-                totalBudget={data?.stats?.totalBudget || 0}
-                actualCost={data?.stats?.totalBudget ? data.stats.totalBudget * 0.65 : 0}
-                forecastedFinalCost={data?.stats?.totalBudget ? data.stats.totalBudget * 0.85 : 0}
-              />
-              <CommittedCostWidget
-                committedCost={data?.stats?.totalBudget ? data.stats.totalBudget * 0.45 : 0}
-                totalBudget={data?.stats?.totalBudget || 0}
-                subcontracts={[]}
-              />
-            </div>
-          </div>
-        )
+        // Job costing widgets require specific project financials data
+        // These are available in individual project pages
+        return null
       
       case 'budget-alerts':
         return (
           <div className="mb-8">
             <BudgetAlerts />
+          </div>
+        )
+      
+      case 'presupuestos-widget':
+        return (
+          <div className="mb-8">
+            <PresupuestosWidget />
+          </div>
+        )
+      
+      case 'finanzas-widget':
+        return (
+          <div className="mb-8">
+            <FinanzasWidget />
+          </div>
+        )
+      
+      case 'alertas-financieras':
+        return (
+          <div className="mb-8">
+            <AlertasFinancierasWidget />
           </div>
         )
       
@@ -572,8 +582,7 @@ function DashboardError({ error, onRetry }: { error: string, onRetry: () => void
   )
 }
 
-function
- BudgetAlerts() {
+function BudgetAlerts() {
   // Mock alerts - in real app would come from financial service
   const alerts = [
     {
@@ -634,6 +643,347 @@ function
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+function PresupuestosWidget() {
+  const navigate = useNavigate()
+  const { isDarkMode } = useDarkMode()
+  
+  // Mock data - in real app would come from presupuesto service
+  const stats = {
+    total: 12,
+    aprobados: 8,
+    pendientes: 3,
+    rechazados: 1,
+    montoTotal: 450000,
+    tasaConversion: 66.7
+  }
+
+  return (
+    <div className={cn(
+      'rounded-lg shadow-sm border p-6',
+      isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+    )}>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <FileSpreadsheet className="w-6 h-6 text-blue-600" />
+          </div>
+          <div>
+            <h3 className={cn('text-lg font-semibold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+              Presupuestos
+            </h3>
+            <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+              Resumen de cotizaciones
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => navigate('/presupuestos')}
+          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+        >
+          Ver todos →
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className={cn('p-4 rounded-lg', isDarkMode ? 'bg-gray-700' : 'bg-gray-50')}>
+          <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Total</p>
+          <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+            {stats.total}
+          </p>
+        </div>
+        <div className={cn('p-4 rounded-lg', isDarkMode ? 'bg-gray-700' : 'bg-green-50')}>
+          <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-green-600')}>Aprobados</p>
+          <p className={cn('text-2xl font-bold', isDarkMode ? 'text-green-400' : 'text-green-700')}>
+            {stats.aprobados}
+          </p>
+        </div>
+        <div className={cn('p-4 rounded-lg', isDarkMode ? 'bg-gray-700' : 'bg-yellow-50')}>
+          <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-yellow-600')}>Pendientes</p>
+          <p className={cn('text-2xl font-bold', isDarkMode ? 'text-yellow-400' : 'text-yellow-700')}>
+            {stats.pendientes}
+          </p>
+        </div>
+        <div className={cn('p-4 rounded-lg', isDarkMode ? 'bg-gray-700' : 'bg-red-50')}>
+          <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-red-600')}>Rechazados</p>
+          <p className={cn('text-2xl font-bold', isDarkMode ? 'text-red-400' : 'text-red-700')}>
+            {stats.rechazados}
+          </p>
+        </div>
+      </div>
+
+      <div className={cn('p-4 rounded-lg mb-4', isDarkMode ? 'bg-gray-700' : 'bg-blue-50')}>
+        <div className="flex items-center justify-between mb-2">
+          <span className={cn('text-sm font-medium', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
+            Monto Total
+          </span>
+          <span className={cn('text-lg font-bold', isDarkMode ? 'text-blue-400' : 'text-blue-700')}>
+            {formatCurrency(stats.montoTotal)}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className={cn('text-sm font-medium', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
+            Tasa de Conversión
+          </span>
+          <span className={cn('text-lg font-bold', isDarkMode ? 'text-green-400' : 'text-green-700')}>
+            {stats.tasaConversion}%
+          </span>
+        </div>
+      </div>
+
+      <div className="flex space-x-3">
+        <button
+          onClick={() => navigate('/presupuestos/crear')}
+          className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Crear Presupuesto</span>
+        </button>
+        <button
+          onClick={() => navigate('/presupuestos')}
+          className={cn(
+            'flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-lg transition-colors',
+            isDarkMode
+              ? 'bg-gray-700 text-white hover:bg-gray-600'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          )}
+        >
+          <Eye className="w-4 h-4" />
+          <span>Ver Lista</span>
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function FinanzasWidget() {
+  const navigate = useNavigate()
+  const { isDarkMode } = useDarkMode()
+  
+  // Mock data - in real app would come from finanzas service
+  const stats = {
+    ingresos: 380000,
+    gastos: 245000,
+    utilidad: 135000,
+    margen: 35.5,
+    tesoreria: 95000,
+    pagosPendientes: 12
+  }
+
+  return (
+    <div className={cn(
+      'rounded-lg shadow-sm border p-6',
+      isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+    )}>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-green-100 rounded-lg">
+            <Wallet className="w-6 h-6 text-green-600" />
+          </div>
+          <div>
+            <h3 className={cn('text-lg font-semibold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+              Finanzas
+            </h3>
+            <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+              Control financiero
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => navigate('/finanzas')}
+          className="text-green-600 hover:text-green-700 text-sm font-medium"
+        >
+          Ver detalles →
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className={cn('p-4 rounded-lg', isDarkMode ? 'bg-gray-700' : 'bg-green-50')}>
+          <p className={cn('text-sm mb-1', isDarkMode ? 'text-gray-400' : 'text-green-600')}>
+            Ingresos
+          </p>
+          <p className={cn('text-xl font-bold', isDarkMode ? 'text-green-400' : 'text-green-700')}>
+            {formatCurrency(stats.ingresos)}
+          </p>
+        </div>
+        <div className={cn('p-4 rounded-lg', isDarkMode ? 'bg-gray-700' : 'bg-red-50')}>
+          <p className={cn('text-sm mb-1', isDarkMode ? 'text-gray-400' : 'text-red-600')}>
+            Gastos
+          </p>
+          <p className={cn('text-xl font-bold', isDarkMode ? 'text-red-400' : 'text-red-700')}>
+            {formatCurrency(stats.gastos)}
+          </p>
+        </div>
+        <div className={cn('p-4 rounded-lg', isDarkMode ? 'bg-gray-700' : 'bg-blue-50')}>
+          <p className={cn('text-sm mb-1', isDarkMode ? 'text-gray-400' : 'text-blue-600')}>
+            Utilidad
+          </p>
+          <p className={cn('text-xl font-bold', isDarkMode ? 'text-blue-400' : 'text-blue-700')}>
+            {formatCurrency(stats.utilidad)}
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-3 mb-4">
+        <div className="flex items-center justify-between">
+          <span className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+            Margen de Utilidad
+          </span>
+          <span className={cn('text-lg font-bold', isDarkMode ? 'text-green-400' : 'text-green-700')}>
+            {stats.margen}%
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+            Tesorería Disponible
+          </span>
+          <span className={cn('text-lg font-bold', isDarkMode ? 'text-blue-400' : 'text-blue-700')}>
+            {formatCurrency(stats.tesoreria)}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+            Pagos Pendientes
+          </span>
+          <span className={cn('text-lg font-bold', isDarkMode ? 'text-orange-400' : 'text-orange-700')}>
+            {stats.pagosPendientes}
+          </span>
+        </div>
+      </div>
+
+      <button
+        onClick={() => navigate('/finanzas')}
+        className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+      >
+        <Wallet className="w-4 h-4" />
+        <span>Ir a Finanzas</span>
+      </button>
+    </div>
+  )
+}
+
+function AlertasFinancierasWidget() {
+  const navigate = useNavigate()
+  const { isDarkMode } = useDarkMode()
+  
+  // Mock data - in real app would come from alertas service
+  const alertas = [
+    {
+      id: '1',
+      tipo: 'bajo_capital',
+      prioridad: 'critica',
+      titulo: 'Tesorería baja en Proyecto A',
+      mensaje: 'Capital disponible insuficiente para próxima fase',
+      proyectoNombre: 'Proyecto A'
+    },
+    {
+      id: '2',
+      tipo: 'cobro_pendiente',
+      prioridad: 'alta',
+      titulo: 'Fase completada sin cobro',
+      mensaje: 'Fase 2 del Proyecto B completada hace 5 días',
+      proyectoNombre: 'Proyecto B'
+    },
+    {
+      id: '3',
+      tipo: 'sobrecosto',
+      prioridad: 'alta',
+      titulo: 'Sobrecosto detectado',
+      mensaje: 'Gastos superan presupuesto en 15%',
+      proyectoNombre: 'Proyecto C'
+    }
+  ]
+
+  const getPrioridadColor = (prioridad: string) => {
+    switch (prioridad) {
+      case 'critica': return isDarkMode ? 'text-red-400' : 'text-red-600'
+      case 'alta': return isDarkMode ? 'text-orange-400' : 'text-orange-600'
+      case 'media': return isDarkMode ? 'text-yellow-400' : 'text-yellow-600'
+      default: return isDarkMode ? 'text-blue-400' : 'text-blue-600'
+    }
+  }
+
+  const getPrioridadBg = (prioridad: string) => {
+    switch (prioridad) {
+      case 'critica': return isDarkMode ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'
+      case 'alta': return isDarkMode ? 'bg-orange-900/20 border-orange-800' : 'bg-orange-50 border-orange-200'
+      case 'media': return isDarkMode ? 'bg-yellow-900/20 border-yellow-800' : 'bg-yellow-50 border-yellow-200'
+      default: return isDarkMode ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-200'
+    }
+  }
+
+  return (
+    <div className={cn(
+      'rounded-lg shadow-sm border p-6',
+      isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+    )}>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-red-100 rounded-lg">
+            <AlertCircle className="w-6 h-6 text-red-600" />
+          </div>
+          <div>
+            <h3 className={cn('text-lg font-semibold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+              Alertas Financieras
+            </h3>
+            <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+              {alertas.length} alertas activas
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => navigate('/finanzas')}
+          className="text-red-600 hover:text-red-700 text-sm font-medium"
+        >
+          Ver todas →
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        {alertas.map((alerta) => (
+          <div
+            key={alerta.id}
+            className={cn('p-4 rounded-lg border', getPrioridadBg(alerta.prioridad))}
+          >
+            <div className="flex items-start gap-3">
+              <AlertCircle className={cn('w-5 h-5 flex-shrink-0 mt-0.5', getPrioridadColor(alerta.prioridad))} />
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1">
+                  <h4 className={cn('text-sm font-semibold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                    {alerta.titulo}
+                  </h4>
+                  <span className={cn(
+                    'text-xs px-2 py-1 rounded-full font-medium',
+                    alerta.prioridad === 'critica' && 'bg-red-200 text-red-800',
+                    alerta.prioridad === 'alta' && 'bg-orange-200 text-orange-800',
+                    alerta.prioridad === 'media' && 'bg-yellow-200 text-yellow-800'
+                  )}>
+                    {alerta.prioridad.toUpperCase()}
+                  </span>
+                </div>
+                <p className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
+                  {alerta.mensaje}
+                </p>
+                <p className={cn('text-xs mt-1', isDarkMode ? 'text-gray-500' : 'text-gray-600')}>
+                  Proyecto: {alerta.proyectoNombre}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {alertas.length === 0 && (
+        <div className="text-center py-8">
+          <AlertCircle className={cn('w-12 h-12 mx-auto mb-3', isDarkMode ? 'text-gray-600' : 'text-gray-300')} />
+          <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+            No hay alertas financieras activas
+          </p>
+        </div>
+      )}
     </div>
   )
 }

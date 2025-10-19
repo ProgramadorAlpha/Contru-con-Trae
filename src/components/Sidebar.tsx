@@ -13,7 +13,10 @@ import {
   CheckSquare,
   DollarSign,
   Code,
-  Shield
+  Shield,
+  FileSpreadsheet,
+  UserCircle,
+  Wallet
 } from 'lucide-react'
 import { useDarkMode } from '@/hooks/useDarkMode'
 import { cn } from '@/lib/utils'
@@ -21,6 +24,9 @@ import { cn } from '@/lib/utils'
 const menuItems = [
   { name: 'Dashboard', href: '/dashboard-enhanced', icon: BarChart3 },
   { name: 'Proyectos', href: '/projects', icon: Building2 },
+  { name: 'Presupuestos', href: '/presupuestos', icon: FileSpreadsheet },
+  { name: 'Clientes', href: '/clientes', icon: UserCircle },
+  { name: 'Finanzas', href: '/finanzas', icon: Wallet },
   { name: 'Presupuesto', href: '/budget', icon: Calculator },
   { name: 'Reportes', href: '/reports', icon: BarChart3 },
   { name: 'Documentos', href: '/documents', icon: FileText },
@@ -92,7 +98,10 @@ export function Sidebar() {
           const Icon = item.icon
           // Check if current path matches or is a sub-route
           const isActive = location.pathname === item.href || 
-                          (item.href === '/projects' && location.pathname.startsWith('/projects/'))
+                          (item.href === '/projects' && location.pathname.startsWith('/projects/')) ||
+                          (item.href === '/presupuestos' && location.pathname.startsWith('/presupuestos/')) ||
+                          (item.href === '/clientes' && location.pathname.startsWith('/clientes/')) ||
+                          (item.href === '/finanzas' && location.pathname.startsWith('/finanzas/'))
           
           return (
             <Link

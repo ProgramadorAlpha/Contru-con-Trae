@@ -379,25 +379,156 @@ class DocumentoService {
 
   /**
    * Link document to expense
-   * Requirement: 10
+   * Requirement: 10, 15.1, 15.2
+   * Task: 20.1
    */
   async vincularConGasto(documentoId: string, gastoId: string): Promise<void> {
     try {
-      // Validate document is an invoice
+      // Validate document exists
       const documento = await this.getDocumentoCompleto(documentoId);
       
       if (!documento) {
         throw new Error('Document not found');
       }
 
-      if (!documento.es_factura) {
-        throw new Error('Only invoices can be linked to expenses');
+      // Update documento to link to gasto
+      const documentos = this.getDocumentos();
+      const index = documentos.findIndex(d => d.id === documentoId);
+      
+      if (index === -1) {
+        throw new Error('Document not found in storage');
       }
 
-      // In real implementation, would update both tables
-      console.log(`Linking document ${documentoId} to expense ${gastoId}`);
+      // Add gasto_id to documento metadata
+      documentos[index] = {
+        ...documentos[index],
+        metadatos_ia: {
+          ...documentos[index].metadatos_ia,
+          gasto_id: gastoId
+        },
+        updated_at: new Date().toISOString()
+      };
+
+      this.saveDocumentos(documentos);
+
+      console.log(`✅ Document ${documentoId} linked to expense ${gastoId}`);
     } catch (error) {
       console.error('Error linking document to expense:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Link multiple documents to an expense
+   * Requirement: 15.1, 15.2
+   * Task: 20.1
+   */
+  async vincularDocumentosAGasto(documentoIds: string[], gastoId: string): Promise<void> {
+    try {
+      // Validate all documents exist
+      const documentos = this.getDocumentos();
+      const documentosAVincular = documentos.filter(d => documentoIds.includes(d.id));
+      
+      if (documentosAVincular.length !== documentoIds.length) {
+        throw new Error('One or more documents not found');
+      }
+
+      // Link each document
+      for (const documentoId of documentoIds) {
+        await this.vincularConGasto(documentoId, gastoId);
+      }
+
+      console.log(`✅ ${documentoIds.length} documents linked to expense ${gastoId}`);
+    } catch (error) {
+      console.error('Error linking multiple documents to expense:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get documents linked to an expense
+   * Requirement: 15.2, 15.3
+   * Task: 20.1
+   */
+  async getDocumentosPorGasto(gastoId: string): Promise<Documento[]> {
+    try {
+      const documentos = this.getDocumentos();
+      
+      // Find documents linked to this gasto
+      return documentos.filter(d => 
+        d.metadatos_ia?.gasto_id === gastoId
+      );
+    } catch (error) {
+      console.error('Error getting documents by expense:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Unlink document from expense
+   * Requirement: 15.2
+   * Task: 20.1
+   */
+  async desvincularDeGasto(documentoId: string): Promise<void> {
+    try {
+      const documentos = this.getDocumentos();
+      const index = documentos.findIndex(d => d.id === documentoId);
+      
+      if (index === -1) {
+        throw new Error('Document not found');
+      }
+
+      // Remove gasto_id from metadata
+      if (documentos[index].metadatos_ia) {
+        const { gasto_id, ...restMetadata } = documentos[index].metadatos_ia;
+        documentos[index].metadatos_ia = restMetadata;
+      }
+
+      documentos[index].updated_at = new Date().toISOString();
+      
+      this.saveDocumentos(documentos);
+
+      console.log(`✅ Document ${documentoId} unlinked from expense`);
+    } catch (error) {
+      console.error('Error unlinking document from expense:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get documents grouped by expense category
+   * Requirement: 15.4, 15.5
+   * Task: 20.1
+   */
+  async getDocumentosAgrupadosPorCategoria(
+    proyectoId: string,
+    gastos: Array<{ id: string; categoria: string }>
+  ): Promise<Record<string, Documento[]>> {
+    try {
+      const documentos = this.getDocumentos();
+      const proyectoDocumentos = documentos.filter(d => d.proyecto_id === proyectoId);
+      
+      // Create map of gasto_id to categoria
+      const gastoCategoria = new Map<string, string>();
+      gastos.forEach(g => gastoCategoria.set(g.id, g.categoria));
+      
+      // Group documents by expense category
+      const agrupados: Record<string, Documento[]> = {};
+      
+      proyectoDocumentos.forEach(doc => {
+        const gastoId = doc.metadatos_ia?.gasto_id;
+        if (gastoId) {
+          const categoria = gastoCategoria.get(gastoId) || 'Sin categoría';
+          if (!agrupados[categoria]) {
+            agrupados[categoria] = [];
+          }
+          agrupados[categoria].push(doc);
+        }
+      });
+      
+      return agrupados;
+    } catch (error) {
+      console.error('Error grouping documents by category:', error);
       throw error;
     }
   }

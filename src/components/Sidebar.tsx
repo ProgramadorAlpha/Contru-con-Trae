@@ -90,7 +90,9 @@ export function Sidebar() {
       <nav className="mt-6">
         {menuItems.map((item) => {
           const Icon = item.icon
-          const isActive = location.pathname === item.href
+          // Check if current path matches or is a sub-route
+          const isActive = location.pathname === item.href || 
+                          (item.href === '/projects' && location.pathname.startsWith('/projects/'))
           
           return (
             <Link

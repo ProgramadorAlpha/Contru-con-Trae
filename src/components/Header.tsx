@@ -107,6 +107,7 @@ export function Header() {
           
           {/* Settings Button */}
           <button 
+            onClick={() => navigate('/settings')}
             className={cn(
               'p-2 rounded-lg transition-all duration-200',
               'hover:scale-110 active:scale-95',
@@ -116,6 +117,7 @@ export function Header() {
                 : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
             )}
             aria-label="Configuración"
+            title="Configuración"
           >
             <Settings className="w-5 h-5" />
           </button>

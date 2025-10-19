@@ -1,5 +1,5 @@
 /**
- * DocumentsPage - Redesigned
+ * DocumentosPage - Redesigned
  * 
  * Main page for document management with project integration
  * Requirements: 2, 3, 6, 7B
@@ -16,7 +16,7 @@ import { useDocumentos } from '@/hooks/useDocumentos';
 import { proyectosApi } from '@/api/proyectos.api';
 import { formatFileSize } from '@/utils/documentos.utils';
 
-export default function DocumentsPage() {
+export default function DocumentosPage() {
   const [selectedProyecto, setSelectedProyecto] = useState<string>('');
   const [selectedCarpeta, setSelectedCarpeta] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');

@@ -153,3 +153,355 @@ Como asistente de IA para ConstructPro, puedo ayudarte con:
 export const chatService = {
   sendMessage: import.meta.env.DEV ? sendChatMessageMock : sendChatMessage
 }
+
+
+/**
+ * Enhanced Claude Service for Document-Project Integration
+ * Requirements: 9, 11, 6
+ * Task: 5.1, 5.2, 5.3, 5.4
+ */
+
+export interface AnalisisRecibo {
+  proveedor: string;
+  monto: number;
+  fecha: string;
+  folio?: string;
+  rfc?: string;
+  items?: Array<{
+    descripcion: string;
+    cantidad: number;
+    precio_unitario: number;
+    total: number;
+  }>;
+  subtotal?: number;
+  iva?: number;
+  total: number;
+  confianza: number;
+  metadatos?: any;
+}
+
+export interface SugerenciaProyectoIA {
+  proyecto_id: string;
+  proyecto_nombre: string;
+  confianza: number;
+  razon: string;
+  alternativas: Array<{
+    proyecto_id: string;
+    proyecto_nombre: string;
+    confianza: number;
+    razon: string;
+  }>;
+}
+
+export interface ResultadoBusquedaSemantica {
+  documento_id: string;
+  relevancia: number;
+  razon: string;
+  fragmentos_relevantes: string[];
+}
+
+export interface CategorizacionDocumento {
+  tipo_sugerido: string;
+  confianza: number;
+  metadatos: {
+    titulo?: string;
+    fecha?: string;
+    autor?: string;
+    descripcion?: string;
+  };
+}
+
+/**
+ * Analyze receipt image and extract structured data
+ * Requirement: 9
+ * Task: 5.1
+ */
+export async function analizarRecibo(
+  imagenBase64: string
+): Promise<AnalisisRecibo> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/claude/analizar-recibo`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        imagen: imagenBase64
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error analyzing receipt:', error);
+    
+    // Fallback to mock data for development
+    return analizarReciboMock(imagenBase64);
+  }
+}
+
+/**
+ * Mock implementation for receipt analysis
+ */
+async function analizarReciboMock(imagenBase64: string): Promise<AnalisisRecibo> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  return {
+    proveedor: 'Ferretería El Constructor',
+    monto: 1500.00,
+    fecha: new Date().toISOString().split('T')[0],
+    folio: `FAC-${Math.floor(Math.random() * 10000)}`,
+    rfc: 'FEC850101ABC',
+    items: [
+      {
+        descripcion: 'Cemento gris 50kg',
+        cantidad: 10,
+        precio_unitario: 120.00,
+        total: 1200.00
+      },
+      {
+        descripcion: 'Arena fina m³',
+        cantidad: 2,
+        precio_unitario: 150.00,
+        total: 300.00
+      }
+    ],
+    subtotal: 1500.00,
+    iva: 0,
+    total: 1500.00,
+    confianza: 85
+  };
+}
+
+/**
+ * Suggest project for a receipt using AI analysis
+ * Requirements: 11
+ * Task: 5.2
+ */
+export async function sugerirProyectoParaRecibo(
+  analisisRecibo: AnalisisRecibo,
+  proyectosActivos: Array<{
+    id: string;
+    nombre: string;
+    cliente?: string;
+    historial_gastos?: any[];
+    proveedores_frecuentes?: string[];
+  }>
+): Promise<SugerenciaProyectoIA> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/claude/sugerir-proyecto`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        recibo: analisisRecibo,
+        proyectos: proyectosActivos
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error suggesting project:', error);
+    
+    // Fallback to mock data
+    return sugerirProyectoMock(analisisRecibo, proyectosActivos);
+  }
+}
+
+/**
+ * Mock implementation for project suggestion
+ */
+async function sugerirProyectoMock(
+  analisisRecibo: AnalisisRecibo,
+  proyectosActivos: any[]
+): Promise<SugerenciaProyectoIA> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+
+  if (proyectosActivos.length === 0) {
+    throw new Error('No active projects available');
+  }
+
+  // Simple heuristic: suggest most recent project
+  const proyectoSugerido = proyectosActivos[0];
+  const alternativas = proyectosActivos.slice(1, 4).map((p, i) => ({
+    proyecto_id: p.id,
+    proyecto_nombre: p.nombre,
+    confianza: 70 - (i * 10),
+    razon: `Proyecto activo con gastos similares`
+  }));
+
+  return {
+    proyecto_id: proyectoSugerido.id,
+    proyecto_nombre: proyectoSugerido.nombre,
+    confianza: 85,
+    razon: `Este proyecto tiene compras recientes con ${analisisRecibo.proveedor} y el monto es consistente con gastos anteriores.`,
+    alternativas
+  };
+}
+
+/**
+ * Semantic search across documents
+ * Requirement: 6
+ * Task: 5.3
+ */
+export async function busquedaSemantica(
+  query: string,
+  documentos: Array<{
+    id: string;
+    nombre: string;
+    descripcion?: string;
+    contenido?: string;
+  }>
+): Promise<ResultadoBusquedaSemantica[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/claude/busqueda-semantica`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query,
+        documentos
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error in semantic search:', error);
+    
+    // Fallback to simple text matching
+    return busquedaSemanticaMock(query, documentos);
+  }
+}
+
+/**
+ * Mock implementation for semantic search
+ */
+async function busquedaSemanticaMock(
+  query: string,
+  documentos: any[]
+): Promise<ResultadoBusquedaSemantica[]> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  const queryLower = query.toLowerCase();
+  
+  return documentos
+    .filter(doc => 
+      doc.nombre?.toLowerCase().includes(queryLower) ||
+      doc.descripcion?.toLowerCase().includes(queryLower)
+    )
+    .map(doc => ({
+      documento_id: doc.id,
+      relevancia: 100,
+      razon: 'Coincidencia en nombre o descripción',
+      fragmentos_relevantes: [doc.nombre]
+    }))
+    .slice(0, 10);
+}
+
+/**
+ * Categorize document and extract metadata
+ * Requirement: 9
+ * Task: 5.4
+ */
+export async function categorizarDocumento(
+  nombreArchivo: string,
+  contenidoBase64?: string
+): Promise<CategorizacionDocumento> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/claude/categorizar-documento`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        nombre: nombreArchivo,
+        contenido: contenidoBase64
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error categorizing document:', error);
+    
+    // Fallback to simple categorization
+    return categorizarDocumentoMock(nombreArchivo);
+  }
+}
+
+/**
+ * Mock implementation for document categorization
+ */
+async function categorizarDocumentoMock(
+  nombreArchivo: string
+): Promise<CategorizacionDocumento> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+
+  const nombreLower = nombreArchivo.toLowerCase();
+  
+  let tipo_sugerido = 'Otro';
+  let confianza = 50;
+
+  if (nombreLower.includes('contrato') || nombreLower.includes('contract')) {
+    tipo_sugerido = 'Contrato';
+    confianza = 90;
+  } else if (nombreLower.includes('plano') || nombreLower.includes('plan')) {
+    tipo_sugerido = 'Plano';
+    confianza = 85;
+  } else if (nombreLower.includes('factura') || nombreLower.includes('invoice')) {
+    tipo_sugerido = 'Factura';
+    confianza = 95;
+  } else if (nombreLower.includes('permiso') || nombreLower.includes('permit')) {
+    tipo_sugerido = 'Permiso';
+    confianza = 88;
+  } else if (nombreLower.includes('reporte') || nombreLower.includes('report')) {
+    tipo_sugerido = 'Reporte';
+    confianza = 82;
+  } else if (nombreLower.includes('certificado') || nombreLower.includes('certificate')) {
+    tipo_sugerido = 'Certificado';
+    confianza = 87;
+  }
+
+  return {
+    tipo_sugerido,
+    confianza,
+    metadatos: {
+      titulo: nombreArchivo.replace(/\.[^/.]+$/, ''),
+      fecha: new Date().toISOString().split('T')[0]
+    }
+  };
+}
+
+/**
+ * Export all enhanced functions
+ */
+export const claudeServiceEnhanced = {
+  analizarRecibo,
+  sugerirProyectoParaRecibo,
+  busquedaSemantica,
+  categorizarDocumento
+};

@@ -17,6 +17,9 @@ import { ProgressCertificatesPage } from '@/pages/ProgressCertificatesPage'
 import { CostCodesPage } from '@/pages/CostCodesPage'
 import { ExpenseApprovalsPage } from '@/pages/ExpenseApprovalsPage'
 import { ProjectFinancialsPage } from '@/pages/ProjectFinancialsPage'
+import { ProjectIncomePage } from '@/pages/ProjectIncomePage'
+import { ProjectDetailPage } from '@/pages/ProjectDetailPage'
+import { SettingsPage } from '@/pages/SettingsPage'
 import { AuditLogPage } from '@/pages/AuditLogPage'
 import { AIAssistantButton } from '@/components/ai/AIAssistantButton'
 import { AIAssistantModal } from '@/components/ai/AIAssistantModal'
@@ -53,6 +56,9 @@ export default function App() {
             <Route path="/cost-codes" element={<CostCodesPage />} />
             <Route path="/expense-approvals" element={<ExpenseApprovalsPage />} />
               <Route path="/project-financials/:projectId" element={<ProjectFinancialsPage />} />
+              <Route path="/projects/:projectId/income" element={<ProjectIncomePage />} />
+              <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
               <Route path="/audit-log" element={<AuditLogPage />} />
             </Route>
           </Route>

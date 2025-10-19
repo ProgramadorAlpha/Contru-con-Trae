@@ -3,12 +3,16 @@ import { Plus, Search, Edit, Trash2, Eye, Calendar, DollarSign, MapPin, Building
 import { useNavigate } from 'react-router-dom'
 import { projectAPI } from '@/lib/api'
 import { formatCurrency, formatDate } from '@/lib/chartUtils'
+import { EditProjectModal } from '@/components/projects/EditProjectModal'
+import { DeleteProjectModal } from '@/components/projects/DeleteProjectModal'
 
 export function ProjectsPage() {
   const navigate = useNavigate()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [editingProject, setEditingProject] = useState(null)
+  const [deletingProject, setDeletingProject] = useState(null)
 
   useEffect(() => {
     loadProjects()
@@ -177,19 +181,31 @@ export function ProjectsPage() {
               <div className="flex justify-between items-center mt-4 pt-4 border-t">
                 <button
                   onClick={() => navigate(`/project-financials/${project.id}`)}
-                  className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
                 >
                   <DollarSign className="w-4 h-4" />
                   Ver Financieros
                 </button>
                 <div className="flex space-x-2">
-                  <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
+                  <button 
+                    onClick={() => navigate(`/projects/${project.id}`)}
+                    className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    title="Ver detalles"
+                  >
                     <Eye className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-green-600 transition-colors">
+                  <button 
+                    onClick={() => setEditingProject(project)}
+                    className="p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors" 
+                    title="Editar"
+                  >
                     <Edit className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-red-600 transition-colors">
+                  <button 
+                    onClick={() => setDeletingProject(project)}
+                    className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors" 
+                    title="Eliminar"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -202,9 +218,39 @@ export function ProjectsPage() {
       {filteredProjects.length === 0 && (
         <div className="text-center py-12">
           <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron proyectos</h3>
-          <p className="text-gray-500">Intenta ajustar tu búsqueda o crea un nuevo proyecto.</p>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No se encontraron proyectos</h3>
+          <p className="text-gray-500 dark:text-gray-400">Intenta ajustar tu búsqueda o crea un nuevo proyecto.</p>
         </div>
+      )}
+
+      {/* Edit Project Modal */}
+      {editingProject && (
+        <EditProjectModal
+          isOpen={!!editingProject}
+          onClose={() => setEditingProject(null)}
+          project={editingProject}
+          onSuccess={(updatedProject) => {
+            // Actualizar el proyecto en la lista
+            setProjects(projects.map(p => 
+              p.id === updatedProject.id ? updatedProject : p
+            ))
+            setEditingProject(null)
+          }}
+        />
+      )}
+
+      {/* Delete Project Modal */}
+      {deletingProject && (
+        <DeleteProjectModal
+          isOpen={!!deletingProject}
+          onClose={() => setDeletingProject(null)}
+          project={deletingProject}
+          onConfirm={(projectId) => {
+            // Eliminar el proyecto de la lista
+            setProjects(projects.filter(p => p.id !== projectId))
+            setDeletingProject(null)
+          }}
+        />
       )}
     </main>
   )

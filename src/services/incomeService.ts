@@ -12,54 +12,79 @@ import type {
   IncomeStats
 } from '@/types/income'
 
-// Mock data for development
-const mockIncomes: Income[] = [
-  {
-    id: 'INC-001',
-    projectId: 'proj-001',
-    projectName: 'Construcción Edificio Central',
-    amount: 50000,
-    currency: 'USD',
-    date: '2024-10-15',
-    description: 'Pago inicial del cliente - Fase 1',
-    paymentMethod: 'bank_transfer',
-    reference: 'TRANS-2024-001',
-    invoiceNumber: 'INV-001',
-    createdBy: 'user-001',
-    createdAt: '2024-10-15T10:00:00Z',
-    updatedAt: '2024-10-15T10:00:00Z',
-    status: 'confirmed'
-  },
-  {
-    id: 'INC-002',
-    projectId: 'proj-002',
-    projectName: 'Remodelación Casa Residencial',
-    amount: 25000,
-    currency: 'USD',
-    date: '2024-10-16',
-    description: 'Pago por avance de obra - 50%',
-    paymentMethod: 'check',
-    reference: 'CHK-5678',
-    createdBy: 'user-001',
-    createdAt: '2024-10-16T14:30:00Z',
-    updatedAt: '2024-10-16T14:30:00Z',
-    status: 'confirmed'
-  },
-  {
-    id: 'INC-003',
-    projectId: 'proj-001',
-    projectName: 'Construcción Edificio Central',
-    amount: 30000,
-    currency: 'USD',
-    date: '2024-10-17',
-    description: 'Pago pendiente - Fase 2',
-    paymentMethod: 'bank_transfer',
-    createdBy: 'user-001',
-    createdAt: '2024-10-17T09:15:00Z',
-    updatedAt: '2024-10-17T09:15:00Z',
-    status: 'pending'
+// Mock data for development - with localStorage persistence
+const STORAGE_KEY = 'constructpro_incomes'
+
+const getInitialMockIncomes = (): Income[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      return JSON.parse(stored)
+    }
+  } catch (error) {
+    console.error('Error loading incomes from localStorage:', error)
   }
-]
+  
+  // Default mock data
+  return [
+    {
+      id: 'INC-001',
+      projectId: 'proj-001',
+      projectName: 'Construcción Edificio Central',
+      amount: 50000,
+      currency: 'USD',
+      date: '2024-10-15',
+      description: 'Pago inicial del cliente - Fase 1',
+      paymentMethod: 'bank_transfer',
+      reference: 'TRANS-2024-001',
+      invoiceNumber: 'INV-001',
+      createdBy: 'user-001',
+      createdAt: '2024-10-15T10:00:00Z',
+      updatedAt: '2024-10-15T10:00:00Z',
+      status: 'confirmed'
+    },
+    {
+      id: 'INC-002',
+      projectId: 'proj-002',
+      projectName: 'Remodelación Casa Residencial',
+      amount: 25000,
+      currency: 'USD',
+      date: '2024-10-16',
+      description: 'Pago por avance de obra - 50%',
+      paymentMethod: 'check',
+      reference: 'CHK-5678',
+      createdBy: 'user-001',
+      createdAt: '2024-10-16T14:30:00Z',
+      updatedAt: '2024-10-16T14:30:00Z',
+      status: 'confirmed'
+    },
+    {
+      id: 'INC-003',
+      projectId: 'proj-001',
+      projectName: 'Construcción Edificio Central',
+      amount: 30000,
+      currency: 'USD',
+      date: '2024-10-17',
+      description: 'Pago pendiente - Fase 2',
+      paymentMethod: 'bank_transfer',
+      createdBy: 'user-001',
+      createdAt: '2024-10-17T09:15:00Z',
+      updatedAt: '2024-10-17T09:15:00Z',
+      status: 'pending'
+    }
+  ]
+}
+
+const mockIncomes: Income[] = getInitialMockIncomes()
+
+// Helper to persist to localStorage
+const persistIncomes = () => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(mockIncomes))
+  } catch (error) {
+    console.error('Error saving incomes to localStorage:', error)
+  }
+}
 
 class IncomeService {
   private baseURL = '/api/incomes'
@@ -132,6 +157,10 @@ class IncomeService {
     }
 
     mockIncomes.push(newIncome)
+    persistIncomes() // ← PERSIST TO LOCALSTORAGE
+    
+    console.log('✅ Income created with projectId:', data.projectId, newIncome)
+    
     return newIncome
   }
 
@@ -170,6 +199,7 @@ class IncomeService {
       updatedAt: new Date().toISOString()
     }
 
+    persistIncomes() // ← PERSIST TO LOCALSTORAGE
     return mockIncomes[index]
   }
 
@@ -190,6 +220,7 @@ class IncomeService {
     }
 
     mockIncomes.splice(index, 1)
+    persistIncomes() // ← PERSIST TO LOCALSTORAGE
   }
 
   /**

@@ -20,7 +20,9 @@
     "deploy:job-costing": "node scripts/deploy-job-costing.js",
     "monitor:job-costing": "node scripts/monitor-job-costing.js",
     "health-check": "node scripts/system-health-check.js",
-    "migrate:job-costing": "node scripts/migrate-job-costing.js"
+    "migrate:job-costing": "node scripts/migrate-job-costing.js",
+    "migrate:documents": "node scripts/migrate_existing_documents.js",
+    "validate:migration": "node scripts/validate_migration.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.67.0",

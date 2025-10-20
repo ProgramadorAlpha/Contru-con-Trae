@@ -141,8 +141,8 @@ export function validarPresupuesto(presupuesto: Partial<Presupuesto>): {
 
   // Validate fechas
   if (presupuesto.fechaValidez && presupuesto.fechaCreacion) {
-    const fechaCreacion = presupuesto.fechaCreacion.toDate ? presupuesto.fechaCreacion.toDate() : presupuesto.fechaCreacion as any;
-    const fechaValidez = presupuesto.fechaValidez.toDate ? presupuesto.fechaValidez.toDate() : presupuesto.fechaValidez as any;
+    const fechaCreacion = toDate(presupuesto.fechaCreacion);
+    const fechaValidez = toDate(presupuesto.fechaValidez);
     
     if (fechaValidez <= fechaCreacion) {
       errores.push('La fecha de validez debe ser posterior a la fecha de creación');
@@ -323,10 +323,22 @@ export function validarPlanPagos(planPagos: PlanPago[], montoTotal: number): {
 export function estaExpirado(presupuesto: Presupuesto): boolean {
   if (!presupuesto.fechaValidez) return false;
   
-  const fechaValidez = presupuesto.fechaValidez.toDate ? presupuesto.fechaValidez.toDate() : presupuesto.fechaValidez as any;
+  const fechaValidez = toDate(presupuesto.fechaValidez);
   const hoy = new Date();
   
   return fechaValidez < hoy;
+}
+
+/**
+ * Convert any date format to Date object
+ * Handles: ISO strings, Firestore Timestamps, and Date objects
+ */
+export function toDate(date: any): Date {
+  if (!date) return new Date();
+  if (date instanceof Date) return date;
+  if (typeof date === 'string') return new Date(date);
+  if (date.toDate && typeof date.toDate === 'function') return date.toDate();
+  return new Date(date);
 }
 
 /**
@@ -335,9 +347,8 @@ export function estaExpirado(presupuesto: Presupuesto): boolean {
 export function diasHastaExpiracion(presupuesto: Presupuesto): number {
   if (!presupuesto.fechaValidez) return 0;
   
-  const fechaValidez = presupuesto.fechaValidez.toDate ? presupuesto.fechaValidez.toDate() : presupuesto.fechaValidez as any;
+  const fechaValidez = toDate(presupuesto.fechaValidez);
   const hoy = new Date();
-  
   const diffTime = fechaValidez.getTime() - hoy.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   

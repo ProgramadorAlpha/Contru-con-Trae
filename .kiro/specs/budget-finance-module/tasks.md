@@ -43,7 +43,7 @@
   - Test: verificar expiración marca presupuestos vencidos
   - _Requirements: 3.1, 3.2, 3.3, 3.5, 3.7_
 
-- [ ] 7. Implementar dashboard y lista de presupuestos
+- [x] 7. Implementar dashboard y lista de presupuestos
 - [x] 7.1 Crear componente PresupuestosDashboard
 
 
@@ -77,7 +77,7 @@
   - Mejorar navegación a detalle de presupuesto
   - _Requirements: 4.1, 4.5, 4.6_
 
-- [ ] 8. Implementar envío y visualización de presupuestos
+- [x] 8. Implementar envío y visualización de presupuestos
 - [x] 8.1 Mejorar utilidad de generación de PDF
 
 
@@ -115,7 +115,7 @@
   - Guardar comentarios si rechaza
   - _Requirements: 13.5, 13.6_
 
-- [ ] 9. Implementar firma digital
+- [x] 9. Implementar firma digital
 - [x] 9.1 Crear componente FirmaDigitalModal
 
 
@@ -134,8 +134,8 @@
   - Almacenar en Firebase Storage
   - _Requirements: 14.4, 14.5, 14.6_
 
-- [ ] 10. Implementar versionado de presupuestos
-- [x] 10.1 Implementar creación de versiones
+- [x] 10. Implementar versionado de presupuestos
+- [x] 10.1 Crear creación de versiones
 
 
   - En `presupuesto.service.ts`, agregar `crearVersionPresupuesto()`
@@ -157,7 +157,7 @@
   - Al aprobar, marcar otras versiones como "Obsoletas"
   - _Requirements: 12.5, 12.6_
 
-- [ ] 11. Implementar servicio de conversión a proyecto
+- [x] 11. Implementar servicio de conversión a proyecto
 - [x] 11.1 Crear servicio de conversión (básico implementado)
 - [x] 11.2 Mejorar generación de factura de adelanto
 
@@ -193,7 +193,7 @@
 
 ## Financial Control (Tasks 12-16)
 
-- [ ] 12. Implementar servicio de tesorería
+- [x] 12. Implementar servicio de tesorería
 - [x] 12.1 Mejorar servicio de tesorería
 
 
@@ -225,7 +225,7 @@
   - Test: indicador rojo cuando tesorería < 20% próxima fase
   - _Requirements: 6.1, 6.5_
 
-- [ ] 13. Implementar sistema de bloqueo de fases
+- [x] 13. Implementar sistema de bloqueo de fases
 - [x] 13.1 Crear servicio de bloqueo de fases
 
 
@@ -255,7 +255,7 @@
   - Test: Fase 2 se desbloquea al cobrar Fase 1
   - _Requirements: 7.1, 7.3, 7.5_
 
-- [ ] 14. Implementar servicio de facturas
+- [x] 14. Implementar servicio de facturas
 - [x] 14.1 Crear servicio de facturas (básico implementado)
 - [x] 14.2 Crear API de facturas
 
@@ -286,7 +286,7 @@
   - Test: generar factura automática al completar fase
   - _Requirements: 9.1, 9.2, 9.7_
 
-- [ ] 15. Implementar componentes de facturas
+- [x] 15. Implementar componentes de facturas
 - [x] 15.1 Crear componente FacturasList
 
 
@@ -315,7 +315,7 @@
   - Actualizar estado a "Cobrada"
   - _Requirements: 9.6, 9.7_
 
-- [ ] 16. Implementar sistema de alertas financieras
+- [x] 16. Implementar sistema de alertas financieras
 - [x] 16.1 Mejorar servicio de alertas
 
 
@@ -358,7 +358,7 @@
 
 ## Dashboard & Analytics (Tasks 17-19)
 
-- [ ] 17. Implementar componentes de alertas
+- [x] 17. Implementar componentes de alertas
 - [x] 17.1 Crear componente AlertasPanel
 
 
@@ -389,7 +389,7 @@
   - Notificaciones in-app para alertas críticas
   - _Requirements: 10.6_
 
-- [ ] 18. Implementar dashboard de finanzas
+- [x] 18. Implementar dashboard de finanzas
 - [x] 18.1 Crear componente FinanzasDashboard
 
 
@@ -510,7 +510,7 @@
   - Links rápidos a crear presupuesto y ver finanzas
   - _Requirements: General UX_
 
-- [-] 22. Instalación de dependencias
+- [x] 22. Instalación de dependencias
 
 - [x] 22.1 Instalar librerías necesarias
 

@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { FacturasList } from '../../components/finanzas/FacturasList';
 import { RegistrarCobroModal } from '../../components/finanzas/RegistrarCobroModal';
+import { facturaService } from '../../services/factura.service';
 import type { Factura } from '../../types/factura.types';
 
 export function FacturacionPage() {
@@ -55,15 +56,20 @@ export function FacturacionPage() {
   const loadFacturas = async () => {
     try {
       setLoading(true);
-      // TODO: Implementar carga de facturas desde Firestore
-      // const facturasData = await facturaService.getFacturas({ estado: filtroEstado });
-      // setFacturas(facturasData);
+      const facturasData = await facturaService.getFacturasAll();
       
-      // Mock data for now
-      setFacturas([]);
-      calculateStats([]);
+      // Apply filter if needed
+      let filteredFacturas = facturasData;
+      if (filtroEstado !== 'todas') {
+        filteredFacturas = facturasData.filter(f => f.estado === filtroEstado);
+      }
+      
+      setFacturas(filteredFacturas);
+      calculateStats(facturasData); // Calculate stats from all facturas
     } catch (error) {
       console.error('Error loading facturas:', error);
+      setFacturas([]);
+      calculateStats([]);
     } finally {
       setLoading(false);
     }
@@ -75,7 +81,7 @@ export function FacturacionPage() {
       .filter(f => f.estado === 'cobrada')
       .reduce((sum, f) => sum + f.total, 0);
     const pendiente = facturasData
-      .filter(f => f.estado === 'enviada' || f.estado === 'vencida')
+      .filter(f => f.estado === 'enviada' || f.estado === 'vencida' || f.estado === 'borrador')
       .reduce((sum, f) => sum + f.total, 0);
     const vencidas = facturasData.filter(f => f.estado === 'vencida').length;
 
